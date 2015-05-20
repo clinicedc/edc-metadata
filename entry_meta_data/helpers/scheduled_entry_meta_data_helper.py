@@ -9,4 +9,4 @@ class ScheduledEntryMetaDataHelper(BaseMetaDataHelper):
 
     meta_data_model = ScheduledEntryMetaData
     entry_model = Entry
-    entry_attr = 'entry'
+    entry_attr = 'edc_entry'

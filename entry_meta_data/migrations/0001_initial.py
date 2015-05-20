@@ -27,11 +27,11 @@ class Migration(SchemaMigration):
             ('close_datetime', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('fill_datetime', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('appointment', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['appointment.Appointment'])),
-            ('entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entry.Entry'])),
+            ('edc_entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['edc_entry.Entry'])),
         ))
         db.send_create_signal('entry_meta_data', ['ScheduledEntryMetaData'])
 
-        # Adding unique constraint on 'ScheduledEntryMetaData', fields ['registered_subject', 'entry', 'appointment']
+        # Adding unique constraint on 'ScheduledEntryMetaData', fields ['registered_subject', 'edc_entry', 'appointment']
         db.create_unique(u'entry_meta_data_scheduledentrymetadata', ['registered_subject_id', 'entry_id', 'appointment_id'])
 
         # Adding model 'RequisitionMetaData'
@@ -53,7 +53,7 @@ class Migration(SchemaMigration):
             ('close_datetime', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('fill_datetime', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('appointment', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['appointment.Appointment'])),
-            ('lab_entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entry.LabEntry'])),
+            ('lab_entry', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['edc_entry.LabEntry'])),
         ))
         db.send_create_signal('entry_meta_data', ['RequisitionMetaData'])
 
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'RequisitionMetaData', fields ['registered_subject', 'lab_entry', 'appointment']
         db.delete_unique(u'entry_meta_data_requisitionmetadata', ['registered_subject_id', 'lab_entry_id', 'appointment_id'])
 
-        # Removing unique constraint on 'ScheduledEntryMetaData', fields ['registered_subject', 'entry', 'appointment']
+        # Removing unique constraint on 'ScheduledEntryMetaData', fields ['registered_subject', 'edc_entry', 'appointment']
         db.delete_unique(u'entry_meta_data_scheduledentrymetadata', ['registered_subject_id', 'entry_id', 'appointment_id'])
 
         # Deleting model 'ScheduledEntryMetaData'
@@ -138,7 +138,7 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'entry.entry': {
+        'edc_entry.edc_entry': {
             'Meta': {'ordering': "['visit_definition__code', 'entry_order']", 'unique_together': "(['visit_definition', 'content_type_map'],)", 'object_name': 'Entry'},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'base_interval': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -167,7 +167,7 @@ class Migration(SchemaMigration):
             'user_modified': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '250', 'db_index': 'True'}),
             'visit_definition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['visit_schedule.VisitDefinition']"})
         },
-        'entry.labentry': {
+        'edc_entry.labentry': {
             'Meta': {'ordering': "['visit_definition__code', 'entry_order']", 'unique_together': "(['visit_definition', 'panel'],)", 'object_name': 'LabEntry'},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'base_interval': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -208,7 +208,7 @@ class Migration(SchemaMigration):
             'hostname_created': ('django.db.models.fields.CharField', [], {'default': "'mac.local'", 'max_length': '50', 'db_index': 'True', 'blank': 'True'}),
             'hostname_modified': ('django.db.models.fields.CharField', [], {'default': "'mac.local'", 'max_length': '50', 'db_index': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.CharField', [], {'max_length': '36', 'primary_key': 'True'}),
-            'lab_entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entry.LabEntry']"}),
+            'lab_entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['edc_entry.LabEntry']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'registered_subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['registration.RegisteredSubject']"}),
             'report_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
@@ -217,13 +217,13 @@ class Migration(SchemaMigration):
             'user_modified': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '250', 'db_index': 'True'})
         },
         'entry_meta_data.scheduledentrymetadata': {
-            'Meta': {'ordering': "['registered_subject', 'entry', 'appointment']", 'unique_together': "(['registered_subject', 'entry', 'appointment'],)", 'object_name': 'ScheduledEntryMetaData'},
+            'Meta': {'ordering': "['registered_subject', 'edc_entry', 'appointment']", 'unique_together': "(['registered_subject', 'edc_entry', 'appointment'],)", 'object_name': 'ScheduledEntryMetaData'},
             'appointment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['appointment.Appointment']"}),
             'close_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'current_entry_title': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True'}),
             'due_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entry.Entry']"}),
+            'edc_entry': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['edc_entry.Entry']"}),
             'entry_comment': ('django.db.models.fields.TextField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
             'entry_status': ('django.db.models.fields.CharField', [], {'default': "'NEW'", 'max_length': '25', 'db_index': 'True'}),
             'fill_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),

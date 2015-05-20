@@ -11,7 +11,7 @@ class EntryMetaDataManager(BaseMetaDataManager):
 
     meta_data_model = ScheduledEntryMetaData
     entry_model = Entry
-    entry_attr = 'entry'
+    entry_attr = 'edc_entry'
 
     def __repr__(self):
         return 'EntryMetaDataManager({0.instance!r})'.format(self)

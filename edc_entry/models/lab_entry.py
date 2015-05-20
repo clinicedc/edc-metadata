@@ -4,11 +4,11 @@ from edc.subject.entry.choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
 from edc.subject.visit_schedule.models import BaseWindowPeriodItem
 from edc.subject.visit_schedule.models import VisitDefinition
 
-from ..exceptions import EntryManagerError
-from ..managers import LabEntryManager
+from edc_entry import EntryManagerError
+from edc_entry import LabEntryManager
 from edc.constants import NOT_REQUIRED, REQUIRED
 
-from .requisition_panel import RequisitionPanel
+from edc_entry import RequisitionPanel
 
 
 class LabEntry(BaseWindowPeriodItem):
@@ -33,7 +33,7 @@ class LabEntry(BaseWindowPeriodItem):
         max_length=25,
         choices=ENTRY_WINDOW,
         default='VISIT',
-        help_text=('Base the entry window period on the visit window period '
+        help_text=('Base the edc_entry window period on the visit window period '
                    'or specify a form specific window period'),
         )
 
@@ -84,7 +84,7 @@ class LabEntry(BaseWindowPeriodItem):
         return not self.required
 
     class Meta:
-        app_label = 'entry'
+        app_label = 'edc_entry'
         verbose_name = "Lab Entry"
         ordering = ['visit_definition__code', 'entry_order', ]
         unique_together = ['visit_definition', 'requisition_panel', ]

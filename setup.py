@@ -10,15 +10,15 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='edc-entry-meta-data',
+    name='edc-edc_entry-meta-data',
     version='0.1.0',
     author=u'Erik van Widenfelt',
     author_email='ew2789@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    url='http://github/botswana-harvard/edc-entry-meta-data',
+    url='http://github/botswana-harvard/edc-edc_entry-meta-data',
     license='GPL licence, see LICENCE',
-    description='Add a metadata layer to data entry.',
+    description='Add a metadata layer to data edc_entry.',
     long_description=README,
     zip_safe=False,
     keywords='django metadata',

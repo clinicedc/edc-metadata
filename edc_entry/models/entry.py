@@ -4,9 +4,9 @@ from edc.constants import NOT_REQUIRED, REQUIRED
 from edc.core.bhp_content_type_map.models import ContentTypeMap
 from edc.subject.visit_schedule.models import BaseWindowPeriodItem, VisitDefinition
 
-from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
-from ..exceptions import EntryManagerError
-from ..managers import EntryManager
+from edc_entry import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
+from edc_entry import EntryManagerError
+from edc_entry import EntryManager
 
 
 class Entry(BaseWindowPeriodItem):
@@ -18,7 +18,7 @@ class Entry(BaseWindowPeriodItem):
     visit_definition = models.ForeignKey(VisitDefinition)
     content_type_map = models.ForeignKey(ContentTypeMap,
         related_name='+',
-        verbose_name='entry form / model')
+        verbose_name='edc_entry form / model')
     entry_order = models.IntegerField()
     group_title = models.CharField(
         max_length=50,
@@ -34,12 +34,12 @@ class Entry(BaseWindowPeriodItem):
         max_length=25,
         choices=ENTRY_WINDOW,
         default='VISIT',
-        help_text='Base the entry window period on the visit window period or specify a form specific window period')
+        help_text='Base the edc_entry window period on the visit window period or specify a form specific window period')
     default_entry_status = models.CharField(
         max_length=25,
         choices=ENTRY_STATUS,
         default=REQUIRED)
-    additional = models.BooleanField(default=False, help_text='If True lists the entry in additional entries')
+    additional = models.BooleanField(default=False, help_text='If True lists the edc_entry in additional entries')
     app_label = models.CharField(max_length=50, null=True)
 
     model_name = models.CharField(max_length=50, null=True)
@@ -79,7 +79,7 @@ class Entry(BaseWindowPeriodItem):
         return not self.required
 
     class Meta:
-        app_label = 'entry'
+        app_label = 'edc_entry'
         verbose_name = "Entry"
         ordering = ['visit_definition__code', 'entry_order', ]
         unique_together = ['visit_definition', 'content_type_map', ]

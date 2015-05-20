@@ -37,7 +37,7 @@ class Migration(SchemaMigration):
             ('app_label', self.gf('django.db.models.fields.CharField')(max_length=50, null=True)),
             ('model_name', self.gf('django.db.models.fields.CharField')(max_length=50, null=True)),
         ))
-        db.send_create_signal('entry', ['Entry'])
+        db.send_create_signal('edc_entry', ['Entry'])
 
         # Adding unique constraint on 'Entry', fields ['visit_definition', 'content_type_map']
         db.create_unique(u'entry_entry', ['visit_definition_id', 'content_type_map_id'])
@@ -55,7 +55,7 @@ class Migration(SchemaMigration):
             ('aliquot_type_alpha_code', self.gf('django.db.models.fields.CharField')(max_length=4)),
             ('rule_group_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
         ))
-        db.send_create_signal('entry', ['RequisitionPanel'])
+        db.send_create_signal('edc_entry', ['RequisitionPanel'])
 
         # Adding model 'LabEntry'
         db.create_table(u'entry_labentry', (
@@ -76,7 +76,7 @@ class Migration(SchemaMigration):
             ('upper_window_unit', self.gf('django.db.models.fields.CharField')(default='D', max_length=10)),
             ('grouping', self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True)),
             ('visit_definition', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['visit_schedule.VisitDefinition'])),
-            ('requisition_panel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['entry.RequisitionPanel'], null=True)),
+            ('requisition_panel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['edc_entry.RequisitionPanel'], null=True)),
             ('app_label', self.gf('django.db.models.fields.CharField')(max_length=50, null=True)),
             ('model_name', self.gf('django.db.models.fields.CharField')(max_length=50, null=True)),
             ('entry_order', self.gf('django.db.models.fields.IntegerField')()),
@@ -85,7 +85,7 @@ class Migration(SchemaMigration):
             ('default_entry_status', self.gf('django.db.models.fields.CharField')(default='NEW', max_length=25)),
             ('additional', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
-        db.send_create_signal('entry', ['LabEntry'])
+        db.send_create_signal('edc_entry', ['LabEntry'])
 
         # Adding unique constraint on 'LabEntry', fields ['visit_definition', 'requisition_panel']
         db.create_unique(u'entry_labentry', ['visit_definition_id', 'requisition_panel_id'])
@@ -131,7 +131,7 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'entry.entry': {
+        'edc_entry.edc_entry': {
             'Meta': {'ordering': "['visit_definition__code', 'entry_order']", 'unique_together': "(['visit_definition', 'content_type_map'],)", 'object_name': 'Entry'},
             'additional': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
@@ -160,7 +160,7 @@ class Migration(SchemaMigration):
             'user_modified': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '250', 'db_index': 'True'}),
             'visit_definition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['visit_schedule.VisitDefinition']"})
         },
-        'entry.labentry': {
+        'edc_entry.labentry': {
             'Meta': {'ordering': "['visit_definition__code', 'entry_order']", 'unique_together': "(['visit_definition', 'requisition_panel'],)", 'object_name': 'LabEntry'},
             'additional': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
@@ -179,7 +179,7 @@ class Migration(SchemaMigration):
             'lower_window_unit': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '10'}),
             'model_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'requisition_panel': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['entry.RequisitionPanel']", 'null': 'True'}),
+            'requisition_panel': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['edc_entry.RequisitionPanel']", 'null': 'True'}),
             'revision': ('django.db.models.fields.CharField', [], {'max_length': '150', 'null': 'True', 'blank': 'True'}),
             'time_point': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'upper_window': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -188,7 +188,7 @@ class Migration(SchemaMigration):
             'user_modified': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '250', 'db_index': 'True'}),
             'visit_definition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['visit_schedule.VisitDefinition']"})
         },
-        'entry.requisitionpanel': {
+        'edc_entry.requisitionpanel': {
             'Meta': {'object_name': 'RequisitionPanel'},
             'aliquot_type_alpha_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -258,4 +258,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['entry']
+    complete_apps = ['edc_entry']

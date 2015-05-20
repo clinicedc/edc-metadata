@@ -7,7 +7,7 @@ from edc.subject.visit_tracking.settings import VISIT_REASON_NO_FOLLOW_UP_CHOICE
 
 
 class BaseMetaDataHelper(object):
-    """ Base class for all classes that manage the entry state of additional, scheduled and unscheduled data."""
+    """ Base class for all classes that manage the edc_entry state of additional, scheduled and unscheduled data."""
     def __init__(self, appointment, visit_instance=None, visit_model_attrname=None):
         self.appointment = appointment
         self.visit_model = self.appointment.visit_definition.visit_tracking_content_type_map.model_class()
@@ -97,7 +97,7 @@ class BaseMetaDataHelper(object):
                 model.entry_meta_data_manager.run_rule_groups()
 
     def get_next_entry_for(self, entry_order):
-        """Gets next meta data instance based on the given entry order, used with the save_next button on a form."""
+        """Gets next meta data instance based on the given edc_entry order, used with the save_next button on a form."""
         next_meta_data_instance = None
         options = {
             'registered_subject_id': self.registered_subject.pk,

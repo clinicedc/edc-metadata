@@ -9,7 +9,7 @@
 # from edc.dashboard.subject.classes import RegisteredSubjectDashboard
 # from edc.subject.appointment.models import Appointment
 # from edc.subject.consent.tests.factories import ConsentCatalogueFactory
-# from edc.subject.entry.tests.factories import EntryFactory
+# from edc.subject.edc_entry.tests.factories import EntryFactory
 # from edc.subject.lab_entry.tests.factories import LabEntryFactory
 # from edc.subject.lab_entry.models import ScheduledLabEntryMetaData
 # from edc.subject.lab_tracker.classes import site_lab_tracker

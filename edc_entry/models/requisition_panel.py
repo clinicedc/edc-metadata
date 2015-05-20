@@ -2,7 +2,7 @@ from django.db import models
 
 from edc.base.model.models import BaseModel
 
-from ..managers import RequisitionPanelManager
+from edc_entry import RequisitionPanelManager
 
 
 class RequisitionPanel(BaseModel):
@@ -31,4 +31,4 @@ class RequisitionPanel(BaseModel):
         super(RequisitionPanel, self).save(*args, **kwargs)
 
     class Meta:
-        app_label = 'entry'
+        app_label = 'edc_entry'
