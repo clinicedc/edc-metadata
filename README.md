@@ -1,4 +1,4 @@
-# edc-entry-meta-data
+# edc-entry
 
 Adds models and functionality to have a meta-data layer above models.
 
