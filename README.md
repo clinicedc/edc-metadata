@@ -1,6 +1,6 @@
 # edc-entry
 
-Adds models and functionality to have a meta-data layer above models.
+Adds models and other functionality to support a meta-data layer above models/CRFs.
 
 Introduction
 ------------
