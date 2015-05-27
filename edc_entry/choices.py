@@ -1,22 +1,22 @@
-from edc.constants import NEW, NOT_REQUIRED, KEYED
+from edc_constants.constants import NEW, NOT_REQUIRED, KEYED
 
 ENTRY_CATEGORY = (
     ('CLINIC', 'Clinic'),
     ('LAB', 'Lab'),
     ('OTHER', 'Other'),
-    )
+)
 
 ENTRY_STATUS = (
     (NEW, 'New'),
     (KEYED, 'Keyed'),
     ('MISSED', 'Missed'),
     (NOT_REQUIRED, 'Not required'),
-    )
+)
 
 ENTRY_WINDOW = (
     ('VISIT', 'Visit'),
     ('FORM', 'Form'),
-    )
+)
 
 TAG_TYPE = (
     ('REGISTRATION', 'Registration'),
@@ -40,7 +40,7 @@ VISIT_INFO_SOURCE = (
     ('family', '4. Contact with family or designated person who can provide information'),
     ('chart', '5. Hospital chart or other medical record'),
     ('OTHER', '9. Other'),
-    )
+)
 
 VISIT_REASON = (
     ('scheduled', '1. Scheduled visit/contact'),

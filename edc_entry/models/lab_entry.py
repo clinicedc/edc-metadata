@@ -1,14 +1,15 @@
+from django.apps import apps
 from django.db import models
 
-from edc.subject.entry.choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
-from edc.subject.visit_schedule.models import BaseWindowPeriodItem
-from edc.subject.visit_schedule.models import VisitDefinition
+from edc_constants.constants import NOT_REQUIRED, REQUIRED
+from edc_entry.choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
+from edc_visit_schedule.models import BaseWindowPeriodItem
+from edc_visit_schedule.models import VisitDefinition
 
-from edc_entry import EntryManagerError
-from edc_entry import LabEntryManager
-from edc.constants import NOT_REQUIRED, REQUIRED
+from ..exceptions import EntryManagerError
+from ..managers import LabEntryManager
 
-from edc_entry import RequisitionPanel
+from ..models import RequisitionPanel
 
 
 class LabEntry(BaseWindowPeriodItem):
@@ -27,7 +28,7 @@ class LabEntry(BaseWindowPeriodItem):
         max_length=25,
         choices=ENTRY_CATEGORY,
         default='CLINIC',
-        )
+    )
 
     entry_window_calculation = models.CharField(
         max_length=25,
@@ -35,13 +36,13 @@ class LabEntry(BaseWindowPeriodItem):
         default='VISIT',
         help_text=('Base the edc_entry window period on the visit window period '
                    'or specify a form specific window period'),
-        )
+    )
 
     default_entry_status = models.CharField(
         max_length=25,
         choices=ENTRY_STATUS,
         default=REQUIRED,
-        )
+    )
 
     additional = models.BooleanField(
         default=False,
@@ -50,7 +51,7 @@ class LabEntry(BaseWindowPeriodItem):
     objects = LabEntryManager()
 
     def save(self, *args, **kwargs):
-        model = models.get_model(self.app_label, self.model_name)
+        model = apps.get_model(self.app_label, self.model_name)
         if not model:
             raise TypeError('Lab Entry \'{2}\' cannot determine requisition_panel model '
                             'from app_label=\'{0}\' and model_name=\'{1}\''.format(
@@ -67,7 +68,7 @@ class LabEntry(BaseWindowPeriodItem):
         return self.visit_definition.natural_key() + self.requisition_panel.natural_key()
 
     def get_model(self):
-        return models.get_model(self.app_label, self.model_name)
+        return apps.get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name

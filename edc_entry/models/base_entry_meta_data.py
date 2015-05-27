@@ -1,9 +1,10 @@
 from django.db import models
 
-from edc.constants import NOT_REQUIRED
+from edc_constants.constants import NOT_REQUIRED
 from edc_sync.models import BaseSyncUuidModel
 from edc_registration.models import RegisteredSubject
-from entry.choices import ENTRY_STATUS
+
+from ..choices import ENTRY_STATUS
 
 
 class BaseEntryMetaData(BaseSyncUuidModel):

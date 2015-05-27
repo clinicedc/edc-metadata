@@ -1,4 +1,4 @@
-from edc.subject.entry.models import Entry
+from edc_entry.models import Entry
 
 from ..models import ScheduledEntryMetaData
 

@@ -1,19 +1,17 @@
 from django.test import TestCase
 
-from edc.core.bhp_variables.models import StudySite
-from edc.entry_meta_data.models import ScheduledEntryMetaData, RequisitionMetaData
-from edc.subject.appointment.models import Appointment
-from edc.subject.entry.models import LabEntry
-from edc.subject.lab_tracker.classes import site_lab_tracker
-from edc.lab.lab_profile.exceptions import AlreadyRegistered as AlreadyRegisteredLabProfile
-from edc.subject.registration.models import RegisteredSubject
-from edc.subject.visit_schedule.models import VisitDefinition
-from edc.testing.models import TestPanel, TestAliquotType, TestScheduledModel1
-from edc.testing.classes import TestVisitSchedule, TestAppConfiguration
-from edc.testing.classes import TestLabProfile
-from edc.testing.tests.factories import TestConsentWithMixinFactory, TestScheduledModel1Factory, TestRequisitionFactory
-from edc.lab.lab_profile.classes import site_lab_profiles
-from edc.testing.tests.factories import TestVisitFactory
+from ..models import ScheduledEntryMetaData, RequisitionMetaData, LabEntry
+from edc_appointment.models import Appointment
+from edc_lab_tracker.classes import site_lab_tracker
+from edc_lab_profile.exceptions import AlreadyRegistered as AlreadyRegisteredLabProfile
+from edc_registration.models import RegisteredSubject
+from edc_visit_schedule.models import VisitDefinition
+from edc_testing.models import TestPanel, TestAliquotType, TestScheduledModel1
+from edc_testing.classes import TestVisitSchedule, TestAppConfiguration
+from edc_testing.classes import TestLabProfile
+from edc_testing.tests.factories import TestConsentWithMixinFactory, TestScheduledModel1Factory, TestRequisitionFactory
+from edc_lab_profile.classes import site_lab_profiles
+from edc_testing.tests.factories import TestVisitFactory
 
 
 class TestsEntryMetaData(TestCase):
@@ -60,11 +58,11 @@ class TestsEntryMetaData(TestCase):
 
     def test_updates_requisition_meta_data(self):
         """Asserts metadata is updated if requisition model is keyed."""
-        self.assertEquals(RequisitionMetaData.objects.all().count(), 0)
+        self.assertEqual(RequisitionMetaData.objects.all().count(), 0)
         self.test_visit = self.test_visit_factory(appointment=self.appointment)
-        self.assertEquals(RequisitionMetaData.objects.all().count(), 3)
+        self.assertEqual(RequisitionMetaData.objects.all().count(), 3)
         self.assertEqual([obj.entry_status for obj in RequisitionMetaData.objects.all()], ['NEW', 'NEW', 'NEW'])
-        self.assertEquals(RequisitionMetaData.objects.filter(entry_status='NEW').count(), 3)
+        self.assertEqual(RequisitionMetaData.objects.filter(entry_status='NEW').count(), 3)
         requisition_panel = RequisitionMetaData.objects.filter(registered_subject=self.registered_subject)[0].lab_entry.requisition_panel
         panel = TestPanel.objects.get(name=requisition_panel.name)
         aliquot_type = TestAliquotType.objects.get(alpha_code=requisition_panel.aliquot_type_alpha_code)
@@ -230,5 +228,5 @@ class TestsEntryMetaData(TestCase):
         self.assertEqual(ScheduledEntryMetaData.objects.filter(registered_subject=self.registered_subject).count(), 0)
         self.test_visit = self.test_visit_factory(appointment=self.appointment)
         for obj in ScheduledEntryMetaData.objects.filter(registered_subject=self.registered_subject):
-            print obj.entry_status, obj.entry
+            print(obj.entry_status, obj.entry)
         self.assertEqual(ScheduledEntryMetaData.objects.filter(entry_status='KEYED', registered_subject=self.registered_subject).count(), 0)

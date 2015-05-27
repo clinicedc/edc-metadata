@@ -4,7 +4,7 @@ from django.db import models
 from edc_appointment.models import Appointment
 from entry.models import Entry
 
-from .base_entry_meta_data import BaseEntryMetaData
+from edc_entry.models.base_entry_meta_data import BaseEntryMetaData
 
 
 class NaturalKeyEntryMetaDataManager(models.Manager):
@@ -41,7 +41,7 @@ class ScheduledEntryMetaData(BaseEntryMetaData):
         return retval
 
     class Meta:
-        app_label = 'entry_meta_data'
+        app_label = 'edc_entry'
         verbose_name = "Scheduled Entry Metadata"
         ordering = ['registered_subject', 'edc_entry', 'appointment']
         unique_together = ['registered_subject', 'edc_entry', 'appointment']

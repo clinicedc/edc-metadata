@@ -1,12 +1,13 @@
+from django.apps import apps
 from django.db import models
 
-from edc.constants import NOT_REQUIRED, REQUIRED
-from edc.core.bhp_content_type_map.models import ContentTypeMap
-from edc.subject.visit_schedule.models import BaseWindowPeriodItem, VisitDefinition
+from edc_constants.constants import NOT_REQUIRED, REQUIRED
+from edc_content_type_map.models import ContentTypeMap
+from edc_visit_schedule.models import BaseWindowPeriodItem, VisitDefinition
 
-from edc_entry import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
-from edc_entry import EntryManagerError
-from edc_entry import EntryManager
+from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
+from ..exceptions import EntryManagerError
+from ..managers import EntryManager
 
 
 class Entry(BaseWindowPeriodItem):
@@ -16,7 +17,8 @@ class Entry(BaseWindowPeriodItem):
     The model class it links to must have the EntryMetaDataManager defined, see exception in save. """
 
     visit_definition = models.ForeignKey(VisitDefinition)
-    content_type_map = models.ForeignKey(ContentTypeMap,
+    content_type_map = models.ForeignKey(
+        ContentTypeMap,
         related_name='+',
         verbose_name='edc_entry form / model')
     entry_order = models.IntegerField()
@@ -34,7 +36,9 @@ class Entry(BaseWindowPeriodItem):
         max_length=25,
         choices=ENTRY_WINDOW,
         default='VISIT',
-        help_text='Base the edc_entry window period on the visit window period or specify a form specific window period')
+        help_text=('Base the edc_entry window period on the visit window period'
+                   'or specify a form specific window period')
+    )
     default_entry_status = models.CharField(
         max_length=25,
         choices=ENTRY_STATUS,
@@ -51,18 +55,21 @@ class Entry(BaseWindowPeriodItem):
             self.app_label = self.content_type_map.app_label
         if not self.model_name:
             self.model_name = self.content_type_map.model
-        model = models.get_model(self.app_label, self.model_name)
+        model = apps.get_model(self.app_label, self.model_name)
         try:
             model.entry_meta_data_manager
         except AttributeError:
-            raise EntryManagerError('Models linked by the Entry class require a meta data manager. Add entry_meta_data_manager=EntryMetaDataManager() to model {0}.{1}'.format(self.app_label, self.model_name))
+            raise EntryManagerError(
+                'Models linked by the Entry class require a meta data manager. '
+                'Add entry_meta_data_manager=EntryMetaDataManager() to model {0}.{1}'.format(
+                    self.app_label, self.model_name))
         super(Entry, self).save(*args, **kwargs)
 
     def natural_key(self):
         return self.visit_definition.natural_key() + self.content_type_map.natural_key()
 
     def get_model(self):
-        return models.get_model(self.app_label, self.model_name)
+        return apps.get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name
