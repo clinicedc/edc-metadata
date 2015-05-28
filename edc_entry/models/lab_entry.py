@@ -9,7 +9,7 @@ from edc_visit_schedule.models import VisitDefinition
 from ..exceptions import EntryManagerError
 from ..managers import LabEntryManager
 
-from ..models import RequisitionPanel
+from .requisition_panel import RequisitionPanel
 
 
 class LabEntry(BaseWindowPeriodItem):

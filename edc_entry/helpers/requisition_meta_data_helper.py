@@ -1,6 +1,4 @@
-from entry.models import LabEntry
-
-from ..models import RequisitionMetaData
+from ..models import RequisitionMetaData, LabEntry
 
 from .base_meta_data_helper import BaseMetaDataHelper
 

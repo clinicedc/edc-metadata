@@ -2,7 +2,6 @@ from datetime import date
 
 from edc_constants.constants import REQUIRED
 from edc_base.utils import convert_from_camel
-from edc_visit_tracking.models import BaseVisitTracking
 from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
 
 
@@ -29,10 +28,10 @@ class BaseMetaDataHelper(object):
     @visit_model.setter
     def visit_model(self, model_or_instance):
         try:
-            if issubclass(model_or_instance, BaseVisitTracking):
-                self._visit_model = model_or_instance
-        except TypeError:
+            model_or_instance()
             self._visit_model = model_or_instance.__class__
+        except TypeError:
+            self._visit_model = model_or_instance
 
     @property
     def visit_model_attrname(self):
@@ -48,10 +47,11 @@ class BaseMetaDataHelper(object):
 
     @visit_instance.setter
     def visit_instance(self, model_or_instance):
-        if isinstance(model_or_instance, BaseVisitTracking):
-            self._visit_instance = model_or_instance
-        else:
+        try:
+            model_or_instance()
             self._visit_instance = self.visit_model.objects.get(appointment=self.appointment)
+        except TypeError:
+            self._visit_instance = model_or_instance
 
     @property
     def appointment_zero(self):
