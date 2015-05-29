@@ -2,7 +2,7 @@ from datetime import date
 
 from edc_constants.constants import REQUIRED
 from edc_base.utils import convert_from_camel
-from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
+# from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
 
 
 class BaseMetaDataHelper(object):
@@ -65,28 +65,28 @@ class BaseMetaDataHelper(object):
             self._appointment_zero = self.appointment
         return self._appointment_zero
 
-    def show_scheduled_entries(self):
-        # TODO: need to clean this up!
-        if 'get_visit_reason_no_follow_up_choices' in dir(self.visit_instance):
-            visit_reason_no_follow_up_choices = self.visit_instance.get_visit_reason_no_follow_up_choices()
-        else:
-            visit_reason_no_follow_up_choices = VISIT_REASON_NO_FOLLOW_UP_CHOICES
-        show_scheduled_entries = (
-            self.visit_instance.reason.lower() not in [
-                x.lower() for x in visit_reason_no_follow_up_choices.itervalues()])
-        # possible conditions that override above
-        # subject is at the off study visit (lost)
-        if self.visit_instance.reason.lower() in self.visit_instance.get_off_study_reason():
-            visit_date = date(self.visit_instance.report_datetime.year,
-                              self.visit_instance.report_datetime.month,
-                              self.visit_instance.report_datetime.day)
-            if self.visit_instance.get_off_study_cls().objects.filter(
-                    registered_subject=self.registered_subject, offstudy_date=visit_date):
-                # has an off study form completed on same day as visit
-                off_study_instance = self.visit_instance.get_off_study_cls().objects.get(
-                    registered_subject=self.registered_subject, offstudy_date=visit_date)
-                show_scheduled_entries = off_study_instance.show_scheduled_entries_on_off_study_date()
-        return show_scheduled_entries
+# moved to appt helper
+#     def show_scheduled_entries(self):
+#         try:
+#             visit_reason_no_follow_up_choices = self.visit_instance.get_visit_reason_no_follow_up_choices()
+#         except AttributeError:
+#             visit_reason_no_follow_up_choices = VISIT_REASON_NO_FOLLOW_UP_CHOICES
+#         show_scheduled_entries = (
+#             self.visit_instance.reason.lower() not in [
+#                 x.lower() for x in visit_reason_no_follow_up_choices.values()])
+#         # possible conditions that override above
+#         # subject is at the off study visit (lost)
+#         if self.visit_instance.reason.lower() in self.visit_instance.get_off_study_reason():
+#             visit_date = date(self.visit_instance.report_datetime.year,
+#                               self.visit_instance.report_datetime.month,
+#                               self.visit_instance.report_datetime.day)
+#             if self.visit_instance.get_off_study_cls().objects.filter(
+#                     registered_subject=self.registered_subject, offstudy_date=visit_date):
+#                 # has an off study form completed on same day as visit
+#                 off_study_instance = self.visit_instance.get_off_study_cls().objects.get(
+#                     registered_subject=self.registered_subject, offstudy_date=visit_date)
+#                 show_scheduled_entries = off_study_instance.show_scheduled_entries_on_off_study_date()
+#         return show_scheduled_entries
 
     def add_or_update_for_visit(self):
         """ Loops thru the list of entries configured for the visit_definition

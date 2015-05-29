@@ -2,9 +2,9 @@ from django.apps import apps
 from django.db import models
 
 from edc_appointment.models import Appointment
-from entry.models import Entry
 
-from edc_entry.models.base_entry_meta_data import BaseEntryMetaData
+from .base_entry_meta_data import BaseEntryMetaData
+from .entry import Entry
 
 
 class NaturalKeyEntryMetaDataManager(models.Manager):
