@@ -1,13 +1,17 @@
 from django.db import models
 
+from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED
-from edc_sync.models import BaseSyncUuidModel
 from edc_registration.models import RegisteredSubject
+try:
+    from edc_sync.mixins import SyncMixin
+except ImportError:
+    SyncMixin = type('SyncMixin', (object, ), {})
 
 from ..choices import ENTRY_STATUS
 
 
-class BaseEntryMetaData(BaseSyncUuidModel):
+class BaseEntryMetaData(SyncMixin, BaseUuidModel):
 
     """ Base model for list of required entries by registered_subject. """
 

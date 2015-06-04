@@ -1,17 +1,16 @@
 from django.core.exceptions import ImproperlyConfigured
 
-from edc.subject.entry.models import LabEntry
-from edc.constants import REQUIRED, NOT_REQUIRED, KEYED
+from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED
 
-from ..models import RequisitionMetaData
+# from ..models import LabEntry, RequisitionMetaData
 
 from .base_meta_data_manager import BaseMetaDataManager
 
 
 class RequisitionMetaDataManager(BaseMetaDataManager):
 
-    meta_data_model = RequisitionMetaData
-    entry_model = LabEntry
+    meta_data_model = None  # e.g. RequisitionMetaData
+    entry_model = None  # e.g. LabEntry
     entry_attr = 'lab_entry'
 
     def __init__(self, visit_model, visit_attr_name=None):
@@ -46,7 +45,8 @@ class RequisitionMetaDataManager(BaseMetaDataManager):
                 '{0}__requisition_panel__name__iexact'.format(self.entry_attr): self.target_requisition_panel}
 
     def create_meta_data(self):
-        """Creates a meta_data instance for the model at the time point (appointment) for the given registered_subject.
+        """Creates a meta_data instance for the model at the time point
+        (appointment) for the given registered_subject.
 
         might return None and meta data not created based on visit reason (e.g. missed)."""
         if self.visit_instance.reason not in self.skip_create_visit_reasons:
@@ -55,8 +55,7 @@ class RequisitionMetaDataManager(BaseMetaDataManager):
                     app_label=self.model._meta.app_label.lower(),
                     model_name=self.model._meta.object_name.lower(),
                     visit_definition=self.visit_instance.appointment.visit_definition,
-                    requisition_panel__name=self.target_requisition_panel,
-                    )
+                    requisition_panel__name=self.target_requisition_panel)
             except self.entry_model.DoesNotExist:
                 raise ImproperlyConfigured('LabEntry matching query does not exist. Model {0}.Check your'
                                            ' visit schedule configuration or rule groups.'.format(self.model))
@@ -69,8 +68,7 @@ class RequisitionMetaDataManager(BaseMetaDataManager):
                 registered_subject=self.visit_instance.appointment.registered_subject,
                 due_datetime=lab_entry.visit_definition.get_upper_window_datetime(self.visit_instance.report_datetime),
                 lab_entry=lab_entry,
-                entry_status=entry_status,
-                )
+                entry_status=entry_status)
         return None
 
     @property

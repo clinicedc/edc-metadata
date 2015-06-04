@@ -1,2 +1,2 @@
-from .entry_meta_data_manager import EntryMetaDataManager
-from .requisition_meta_data_manager import RequisitionMetaDataManager
+from edc_entry.managers.entry_meta_data_manager import EntryMetaDataManager
+from edc_entry.managers.requisition_meta_data_manager import RequisitionMetaDataManager
