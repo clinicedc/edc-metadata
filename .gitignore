@@ -4,6 +4,7 @@ __pycache__/
 .project
 .pydevproject
 .settings
+test-*
 # C extensions
 *.so
 
