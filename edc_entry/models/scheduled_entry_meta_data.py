@@ -25,7 +25,7 @@ class ScheduledEntryMetaData(BaseEntryMetaData):
     objects = ScheduledEntryMetaDataManager()
 
     def __str__(self):
-        return str(self.current_entry_title) or ''
+        return self.entry.entry_form_title
 
     def natural_key(self):
         return self.appointment.natural_key() + self.entry.natural_key()

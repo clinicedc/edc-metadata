@@ -22,7 +22,7 @@ class BaseMetaDataManager(models.Manager):
         self._visit_instance = None
         self.visit_model = visit_model
         self.visit_attr_name = visit_attr_name or convert_from_camel(self.visit_model._meta.object_name)
-        super(BaseMetaDataManager, self).__init__()
+        super().__init__()
 
     def __repr__(self):
         return 'BaseMetaDataManager({0.instance!r})'.format(self)
@@ -37,7 +37,6 @@ class BaseMetaDataManager(models.Manager):
     @instance.setter
     def instance(self, instance):
         self._instance = instance
-#         self.status = None  # this is weird
 
     @property
     def query_options(self):
@@ -75,11 +74,7 @@ class BaseMetaDataManager(models.Manager):
         if not self._meta_data_instance:
             try:
                 self._meta_data_instance = self.meta_data_model.objects.get(**self.meta_data_query_options)
-            except self.meta_data_model.DoesNotExist:
-                pass  # self._meta_data_instance = self.create_meta_data()
-            except ValueError as e:  # Cannot use None as a query value
-                pass
-            except AttributeError as e:
+            except (self.meta_data_model.DoesNotExist, ValueError, AttributeError):
                 pass
         return self._meta_data_instance
 
@@ -93,7 +88,7 @@ class BaseMetaDataManager(models.Manager):
     def create_meta_data(self):
         raise ImproperlyConfigured('Method must be defined in the child class')
 
-    def update_meta_data(self, change_type=None):
+    def update_meta_data(self, instance, change_type=None):
         """Updates the meta_data's instance.
 
         Calls create if meta data does not exist
@@ -122,7 +117,6 @@ class BaseMetaDataManager(models.Manager):
             if new_status and not new_status == self.meta_data_instance.entry_status:
                 if new_status not in [REQUIRED, NOT_REQUIRED, KEYED]:
                     raise ValueError('Expected edc_entry status to be set to one off {0}. Got {1}'.format([REQUIRED, NOT_REQUIRED, KEYED], new_status))
-                #if not self.meta_data_instance.entry_status == status:
                 self.meta_data_instance.entry_status = new_status
                 self.meta_data_instance.save()
 
@@ -134,5 +128,5 @@ class BaseMetaDataManager(models.Manager):
 
     def run_rule_groups(self):
         """Runs rule groups that use the data in this instance; that is, the model is a rule source model."""
-        from edc.subject.rule_groups.classes import site_rule_groups
+        from edc_rule_groups.classes import site_rule_groups
         return site_rule_groups.update_rules_for_source_model(self.model, self.visit_instance)

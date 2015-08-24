@@ -4,7 +4,7 @@ from django.db import models
 from edc_appointment.models import Appointment
 
 from .base_entry_meta_data import BaseEntryMetaData
-from .lab_entry import LabEntry
+from .entry import LabEntry
 
 
 class NaturalKeyRequisitionMetaDataManager(models.Manager):

@@ -27,7 +27,8 @@ def entry_meta_data_on_post_save(sender, instance, raw, created, using, update_f
                     if not created:
                         change_type = 'U'
                     sender.entry_meta_data_manager.instance = instance
-                    sender.entry_meta_data_manager.visit_instance = getattr(instance, sender.entry_meta_data_manager.visit_attr_name)
+                    sender.entry_meta_data_manager.visit_instance = getattr(
+                        instance, sender.entry_meta_data_manager.visit_attr_name)
                     try:
                         sender.entry_meta_data_manager.target_requisition_panel = getattr(instance, 'panel')
                     except AttributeError as e:

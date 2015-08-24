@@ -1,5 +1,4 @@
-from .entry import Entry
-from .lab_entry import LabEntry
+from .entry import Entry, LabEntry
 from .requisition_panel import RequisitionPanel
 from .base_entry_meta_data import BaseEntryMetaData
 from .requisition_meta_data import RequisitionMetaData
