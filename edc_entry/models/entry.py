@@ -3,16 +3,17 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 
-
+from edc_base.model.models.base_uuid_model import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
 from edc_visit_schedule.models import VisitDefinition
 
 from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
 from ..managers import LabEntryManager, EntryManager
 from .requisition_panel import RequisitionPanel
+from .base_window_period_item import BaseWindowPeriodItem
 
 
-class BaseEntry(models.Model):
+class BaseEntry(BaseWindowPeriodItem):
 
     """Links a model to a visit definition.
 
