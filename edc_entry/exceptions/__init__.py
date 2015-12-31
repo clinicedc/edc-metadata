@@ -1,4 +1,0 @@
-
-
-class EntryManagerError(Exception):
-    pass

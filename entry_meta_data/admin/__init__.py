@@ -1,1 +1,0 @@
-from meta_data_admin import ScheduledEntryMetaDataAdmin, RequisitionMetaDataAdmin

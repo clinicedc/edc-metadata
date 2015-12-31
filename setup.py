@@ -10,23 +10,18 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='edc-edc_entry-meta-data',
-    version='0.1.0',
+    name='edc-meta-data',
+    version='0.1.dev',
     author=u'Erik van Widenfelt',
     author_email='ew2789@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    url='http://github/botswana-harvard/edc-edc_entry-meta-data',
+    url='http://github/botswana-harvard/edc-meta-data',
     license='GPL licence, see LICENCE',
-    description='Add a metadata layer to data edc_entry.',
+    description='Add a metadata layer to data entry.',
     long_description=README,
     zip_safe=False,
-    keywords='django metadata',
-    install_requires=[
-        'Django>=1.7',
-        'django-extensions>=1.5.5',
-        'unipath>=1.1',
-    ],
+    keywords='django Edc data entry metadata',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
@@ -36,7 +31,7 @@ setup(
         'Programming Language :: Python',
         # 'Programming Language :: Python :: 3',
         # 'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.4',
+        # 'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],

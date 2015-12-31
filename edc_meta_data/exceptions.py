@@ -1,0 +1,4 @@
+
+
+class MetaDataManagerError(Exception):
+    pass
