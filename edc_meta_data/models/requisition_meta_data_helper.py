@@ -15,18 +15,17 @@ class RequisitionMetaDataHelper(BaseMetaDataHelper):
     def __str__(self):
         return '({0.instance!r})'.format(self)
 
-    def get_entries_for(self, entry_category, entry_status=None):
+    def get_meta_data(self, entry_status=None):
         """Returns a list of meta data instances for the given subject and appointment_zero."""
-        meta_data_instances = []
-        if self.appointment:
-            options = {
-                'appointment_id': self.appointment.pk,
-                '{0}__entry_category__iexact'.format(self.entry_attr): entry_category}
+        if self.appointment:  # TODO: appointment_zero??
+            options = {'appointment_id': self.appointment.pk}
             if entry_status:
                 options.update({'entry_status': entry_status})
-            meta_data_instances = self.meta_data_model.objects.filter(
-                **options).order_by('{0}__entry_order'.format(self.entry_attr))
-        return meta_data_instances
+            meta_data = self.meta_data_model.objects.filter(**options).order_by(
+                '{0}__entry_order'.format(self.entry_attr))
+        else:
+            meta_data = []
+        return meta_data
 
     def add_or_update_for_visit(self):
         """ Loops thru the list of entries configured for the visit_definition

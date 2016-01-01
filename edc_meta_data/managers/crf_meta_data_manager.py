@@ -24,7 +24,7 @@ class CrfMetaDataManager(BaseMetaDataManager):
         Might return None and meta data not created based on visit reason (e.g. missed)."""
         if self.visit_instance.reason not in self.skip_create_visit_reasons:
             try:
-                entry = self.entry_model.objects.get(
+                crf_entry = self.entry_model.objects.get(
                     app_label=self.model._meta.app_label.lower(),
                     model_name=self.model._meta.object_name.lower(),
                     visit_definition=self.appointment_zero.visit_definition)
@@ -36,10 +36,10 @@ class CrfMetaDataManager(BaseMetaDataManager):
             return self.meta_data_model.objects.create(
                 appointment=self.appointment_zero,
                 registered_subject=self.appointment_zero.registered_subject,
-                due_datetime=entry.visit_definition.get_upper_window_datetime(
+                due_datetime=crf_entry.visit_definition.get_upper_window_datetime(
                     self.visit_instance.report_datetime),
-                entry=entry,
-                entry_status=entry.default_entry_status)
+                crf_entry=crf_entry,
+                entry_status=crf_entry.default_entry_status)
         return None
 
     @property

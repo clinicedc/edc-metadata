@@ -1,13 +1,14 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
-from edc.subject.rule_groups.classes import site_rule_groups
+from edc_rule_groups.classes import site_rule_groups
 from edc_registration.models import RegisteredSubject
 from edc_visit_tracking.models import VisitModelMixin
 
-from ..helpers import CrfMetaDataHelper, RequisitionMetaDataHelper
-from .requisition_meta_data import RequisitionMetaData
 from .crf_meta_data import CrfMetaData
+from .crf_meta_data_helper import CrfMetaDataHelper
+from .requisition_meta_data import RequisitionMetaData
+from .requisition_meta_data_helper import RequisitionMetaDataHelper
 
 
 @receiver(post_save, weak=False, dispatch_uid="meta_data_on_post_save")
@@ -26,10 +27,10 @@ def meta_data_on_post_save(sender, instance, raw, created, using, update_fields,
             # call custom meta data changes on this visit tracking instance.
             # see MetaDataMixin for visit model
             try:
-                instance.custom_post_update_entry_meta_data()
+                instance.custom_post_update_crf_meta_data()
             except AttributeError as e:
-                if 'custom_post_update_entry_meta_data' not in str(e):
-                    raise AttributeError('Exception in {}.\'custom_post_update_entry_meta_data\'. Got {}'.format(
+                if 'custom_post_update_crf_meta_data' not in str(e):
+                    raise AttributeError('Exception in {}.\'custom_post_update_crf_meta_data\'. Got {}'.format(
                         instance._meta.model_name, str(e)))
         else:
             # These are subject models covered by a consent.

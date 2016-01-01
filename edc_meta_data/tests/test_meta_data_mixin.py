@@ -1,15 +1,14 @@
 from __future__ import print_function
 
 from django.db import models
+from django.utils import timezone
 
-from edc.entry_meta_data.models import CrfMetaData
+from edc_constants.constants import SCHEDULED, NOT_REQUIRED, OFF_STUDY, REQUIRED
+from edc_meta_data.managers import CrfMetaDataManager
+from edc_meta_data.models import CrfMetaData, CrfEntry
+from edc_testing.models.test_visit import TestVisit
 
 from .base_test_entry_meta_data import BaseTestEntryMetaData
-from django.utils import timezone
-from edc_constants.constants import SCHEDULED, NOT_REQUIRED, OFF_STUDY, REQUIRED
-from edc.subject.entry.models.entry import Entry
-from edc_testing.models.test_visit import TestVisit
-from edc.entry_meta_data.managers import EntryMetaDataManager
 
 
 class DeathReport(models.Model):
@@ -20,7 +19,7 @@ class DeathReport(models.Model):
         verbose_name="Report Date",
         default=timezone.now)
 
-    entry_meta_data_manager = EntryMetaDataManager(TestVisit)
+    entry_meta_data_manager = CrfMetaDataManager(TestVisit)
 
     class Meta:
         app_label = "testing"
@@ -28,7 +27,7 @@ class DeathReport(models.Model):
 
 class TestsEntryMetaData(BaseTestEntryMetaData):
 
-    app_label = 'testing'
+    app_label = 'edc_testing'
     consent_catalogue_name = 'v1'
 
     def test_changes_to_an_unscheduled_visit(self):
@@ -49,7 +48,7 @@ class TestsEntryMetaData(BaseTestEntryMetaData):
             report_datetime=timezone.now(),
             reason=OFF_STUDY)
         visit.change_to_off_study_visit(
-            self.appointment, 'testing', 'testoffstudy')
+            self.appointment, 'edc_testing', 'testoffstudy')
         self.assertEqual(
             [obj.entry_status for obj in CrfMetaData.objects.all()],
             [REQUIRED, NOT_REQUIRED, NOT_REQUIRED, NOT_REQUIRED])
@@ -61,12 +60,12 @@ class TestsEntryMetaData(BaseTestEntryMetaData):
             report_datetime=timezone.now(),
             reason=OFF_STUDY)
         visit.change_to_off_study_visit(
-            self.appointment, 'testing', 'testoffstudy')
-        entry = Entry.objects.get(
-            content_type_map__app_label='testing',
+            self.appointment, 'edc_testing', 'testoffstudy')
+        crf_entry = CrfEntry.objects.get(
+            content_type_map__app_label='edc_testing',
             content_type_map__module_name='testoffstudy')
         self.assertEqual(
-            CrfMetaData.objects.filter(entry=entry).count(), 1)
+            CrfMetaData.objects.filter(crf_entry=crf_entry).count(), 1)
 
     def test_change_to_death(self):
         """Assert changing to death visit adds offstudy and death and sets all others to not required."""
@@ -75,7 +74,7 @@ class TestsEntryMetaData(BaseTestEntryMetaData):
             report_datetime=timezone.now(),
             reason=OFF_STUDY)
         visit.change_to_death_visit(
-            self.appointment, 'testing', 'testoffstudy', 'deathreport')
+            self.appointment, 'edc_testing', 'testoffstudy', 'deathreport')
         self.assertEqual(
             [obj.entry_status for obj in CrfMetaData.objects.all()],
             [REQUIRED, REQUIRED, NOT_REQUIRED, NOT_REQUIRED, NOT_REQUIRED])
@@ -87,9 +86,9 @@ class TestsEntryMetaData(BaseTestEntryMetaData):
             report_datetime=timezone.now(),
             reason=OFF_STUDY)
         visit.change_to_death_visit(
-            self.appointment, 'testing', 'testoffstudy', 'deathreport')
-        entry = Entry.objects.get(
-            content_type_map__app_label='testing',
+            self.appointment, 'edc_testing', 'testoffstudy', 'deathreport')
+        crf_entry = CrfEntry.objects.get(
+            content_type_map__app_label='edc_testing',
             content_type_map__module_name='deathreport')
         self.assertEqual(
-            CrfMetaData.objects.filter(entry=entry).count(), 1)
+            CrfMetaData.objects.filter(crf_entry=crf_entry).count(), 1)

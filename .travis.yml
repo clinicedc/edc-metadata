@@ -16,10 +16,10 @@ install:
   - pip install -q -r requirements.txt --use-mirrors
 
 before_script:
-  - flake8 entry_meta_data
+  - flake8 edc_meta_data
 
 script: 
-  - coverage run --source=entry_meta_data manage.py test
+  - coverage run --source=edc_meta_data manage.py test
 
 after_success:
   - coveralls

@@ -1,17 +1,25 @@
 from django.db import models
+from django.db.models import get_model
 
-from edc_visit_schedule.models import BaseWindowPeriodItem
-from edc_visit_schedule.models import VisitDefinition
+from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
+from edc_visit_schedule.models import VisitDefinition
 
 from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
 from ..exceptions import MetaDataManagerError
-from ..managers import LabEntryManager
 
 from .requisition_panel import RequisitionPanel
 
 
-class LabEntry(BaseWindowPeriodItem):
+class LabEntryManager(models.Manager):
+
+    def get_by_natural_key(self, visit_definition_code, name):
+        visit_definition = VisitDefinition.objects.get_by_natural_key(visit_definition_code)
+        requisition_panel = RequisitionPanel.objects.get_by_natural_key(name)
+        return self.get(requisition_panel=requisition_panel, visit_definition=visit_definition)
+
+
+class LabEntry(BaseUuidModel):
 
     visit_definition = models.ForeignKey(VisitDefinition)
 
@@ -47,7 +55,7 @@ class LabEntry(BaseWindowPeriodItem):
     objects = LabEntryManager()
 
     def save(self, *args, **kwargs):
-        model = models.get_model(self.app_label, self.model_name)
+        model = get_model(self.app_label, self.model_name)
         if not model:
             raise TypeError('Lab Entry \'{2}\' cannot determine requisition_panel model '
                             'from app_label=\'{0}\' and model_name=\'{1}\''.format(
@@ -65,7 +73,7 @@ class LabEntry(BaseWindowPeriodItem):
         return self.visit_definition.natural_key() + self.requisition_panel.natural_key()
 
     def get_model(self):
-        return models.get_model(self.app_label, self.model_name)
+        return get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name

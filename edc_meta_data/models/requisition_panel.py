@@ -2,7 +2,11 @@ from django.db import models
 
 from edc_base.model.models import BaseModel
 
-from ..managers import RequisitionPanelManager
+
+class RequisitionPanelManager(models.Manager):
+
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
 
 
 class RequisitionPanel(BaseModel):

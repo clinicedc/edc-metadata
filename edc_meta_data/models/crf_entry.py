@@ -1,15 +1,25 @@
 from django.db import models
+from django.db.models import get_model
 
 from edc.core.bhp_content_type_map.models import ContentTypeMap
+from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
-from edc_visit_schedule.models import BaseWindowPeriodItem, VisitDefinition
+from edc_visit_schedule.models import VisitDefinition
 
 from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS
 from ..exceptions import MetaDataManagerError
-from ..managers import EntryManager
 
 
-class CrfEntry(BaseWindowPeriodItem):
+class EntryManager(models.Manager):
+
+    def get_by_natural_key(self, visit_definition_code, app_label, model):
+        """Returns the instance using the natural key."""
+        visit_definition = VisitDefinition.objects.get_by_natural_key(visit_definition_code)
+        content_type_map = ContentTypeMap.objects.get_by_natural_key(app_label, model)
+        return self.get(content_type_map=content_type_map, visit_definition=visit_definition)
+
+
+class CrfEntry(BaseUuidModel):
 
     """Links a model to a visit definition.
 
@@ -60,7 +70,7 @@ class CrfEntry(BaseWindowPeriodItem):
             self.app_label = self.content_type_map.app_label
         if not self.model_name:
             self.model_name = self.content_type_map.model
-        model = models.get_model(self.app_label, self.model_name)
+        model = get_model(self.app_label, self.model_name)
         try:
             model.entry_meta_data_manager
         except AttributeError:
@@ -74,7 +84,7 @@ class CrfEntry(BaseWindowPeriodItem):
         return self.visit_definition.natural_key() + self.content_type_map.natural_key()
 
     def get_model(self):
-        return models.get_model(self.app_label, self.model_name)
+        return get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name
