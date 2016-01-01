@@ -92,5 +92,6 @@ class LabEntry(BaseUuidModel):
     class Meta:
         app_label = 'edc_meta_data'
         verbose_name = "Lab Entry"
+        verbose_name_plural = "Lab Entries"
         ordering = ['visit_definition__code', 'entry_order', ]
         unique_together = ['visit_definition', 'requisition_panel', ]

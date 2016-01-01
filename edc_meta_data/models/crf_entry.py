@@ -102,6 +102,7 @@ class CrfEntry(BaseUuidModel):
 
     class Meta:
         app_label = 'edc_meta_data'
-        verbose_name = "CrfEntry"
+        verbose_name = "Crf Entry"
+        verbose_name_plural = "Crf Entries"
         ordering = ['visit_definition__code', 'entry_order', ]
         unique_together = ['visit_definition', 'content_type_map', ]

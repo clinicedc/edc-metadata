@@ -43,5 +43,6 @@ class CrfMetaData(BaseMetaData):
     class Meta:
         app_label = 'edc_meta_data'
         verbose_name = "Crf Metadata"
+        verbose_name_plural = "Crf Metadata"
         ordering = ['registered_subject', 'crf_entry', 'appointment']
         unique_together = ['registered_subject', 'crf_entry', 'appointment']

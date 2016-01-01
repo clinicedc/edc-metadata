@@ -42,5 +42,6 @@ class RequisitionMetaData(BaseMetaData):
     class Meta:
         app_label = 'edc_meta_data'
         verbose_name = "Requisition Meta Data"
+        verbose_name_plural = "Requisition Meta Data"
         ordering = ['registered_subject', 'lab_entry__requisition_panel__name', 'appointment', ]
         unique_together = ['registered_subject', 'lab_entry', 'appointment', ]
