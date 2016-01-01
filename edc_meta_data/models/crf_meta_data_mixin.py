@@ -88,8 +88,8 @@ class CrfMetaDataMixin(models.Model):
         try:
             base_appointment = self.get_base_appointment(appointment)
             crf_meta_data = CrfMetaData.objects.get(
-                entry__app_label=app_label,
-                entry__model_name=model_name,
+                crf_entry__app_label=app_label,
+                crf_entry__model_name=model_name,
                 appointment=base_appointment
             )
         except CrfMetaData.DoesNotExist as e:

@@ -9,9 +9,11 @@ class LabEntryAdmin(BaseModelAdmin):
 
     search_fields = ('visit_definition__code', 'requisition_panel__name')
 
-    list_display = ('requisition_panel', 'visit_definition', 'entry_order', 'default_entry_status', 'additional', 'entry_category')
+    list_display = ('requisition_panel', 'visit_definition', 'entry_order',
+                    'default_entry_status', 'additional', 'entry_category')
 
-    list_filter = ('entry_category', 'visit_definition__code', 'default_entry_status', 'additional', 'created', 'requisition_panel__name',)
+    list_filter = ('entry_category', 'visit_definition__code', 'default_entry_status',
+                   'additional', 'created', 'requisition_panel__name',)
 
 admin.site.register(LabEntry, LabEntryAdmin)
 
