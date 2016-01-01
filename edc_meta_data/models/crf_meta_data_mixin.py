@@ -1,8 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
-from edc.core.bhp_content_type_map.models.content_type_map import ContentTypeMap
 from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED
+from edc_content_type_map.models import ContentTypeMap
 
 from .crf_entry import CrfEntry
 from .crf_meta_data import CrfMetaData

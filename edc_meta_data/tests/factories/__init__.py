@@ -1,2 +1,2 @@
-from .entry_factory import EntryFactory
-from lab_entry_factory import LabEntryFactory
+from .crf_entry_factory import CrfEntryFactory
+from .lab_entry_factory import LabEntryFactory

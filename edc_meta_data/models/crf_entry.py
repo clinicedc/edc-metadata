@@ -1,9 +1,9 @@
 from django.db import models
 from django.db.models import get_model
 
-from edc.core.bhp_content_type_map.models import ContentTypeMap
 from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
+from edc_content_type_map.models import ContentTypeMap
 from edc_visit_schedule.models import VisitDefinition
 
 from ..choices import ENTRY_CATEGORY, ENTRY_WINDOW, ENTRY_STATUS

@@ -1,14 +1,14 @@
 import factory
 
-from edc.core.bhp_content_type_map.tests.factories import ContentTypeMapFactory
+from edc_content_type_map.tests.factories import ContentTypeMapFactory
 from edc_visit_schedule.tests.factories import VisitDefinitionFactory
 
-from ...models import Entry
+from edc_meta_data.models import CrfEntry
 
 
-class EntryFactory(factory.DjangoModelFactory):
+class CrfEntryFactory(factory.DjangoModelFactory):
     class Meta:
-        model = Entry
+        model = CrfEntry
 
     visit_definition = factory.SubFactory(VisitDefinitionFactory)
     content_type_map = factory.SubFactory(ContentTypeMapFactory)
