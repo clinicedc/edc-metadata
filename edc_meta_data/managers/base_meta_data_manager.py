@@ -117,7 +117,11 @@ class BaseMetaDataManager(models.Manager):
                     self.meta_data_instance.report_datetime = self.instance.report_datetime
                     if change_type == 'D':
                         self.meta_data_instance.report_datetime = None
-                        new_status = self.default_entry_status
+                        try:
+                            new_status = self.meta_data_instance.crf_entry.default_entry_status
+                        except AttributeError as e:
+                            if 'crf_entry' in str(e):
+                                new_status = self.meta_data_instance.lab_entry.default_entry_status
                 except AttributeError:  # instance is None
                     self.meta_data_instance.report_datetime = None
             elif change_type in [REQUIRED, NOT_REQUIRED]:  # coming from a rule, cannot change if KEYED

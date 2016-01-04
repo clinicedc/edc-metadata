@@ -8,7 +8,7 @@ from edc_meta_data.managers import CrfMetaDataManager
 from edc_meta_data.models import CrfMetaData, CrfEntry
 from edc_testing.models.test_visit import TestVisit
 
-from .base_test_entry_meta_data import BaseTestEntryMetaData
+from .base_test_case import BaseTestCase
 
 
 class DeathReport(models.Model):
@@ -25,10 +25,7 @@ class DeathReport(models.Model):
         app_label = "testing"
 
 
-class TestsEntryMetaData(BaseTestEntryMetaData):
-
-    app_label = 'edc_testing'
-    consent_catalogue_name = 'v1'
+class TestMetaDataMixin(BaseTestCase):
 
     def test_changes_to_an_unscheduled_visit(self):
         """Assert changing to unscheduled visit sets all forms to not required."""

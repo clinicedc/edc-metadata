@@ -131,7 +131,7 @@ class CrfMetaDataMixin(models.Model):
             meta_data.save()
 
     def _create_crf(self, appointment, app_label, model_name):
-        """Creates a form with entry status set to REQUIRED."""
+        """Creates a CrfMetaData with entry_status REQUIRED."""
         base_appointment = self.get_base_appointment(appointment)
         try:
             crf_entry = CrfEntry.objects.get(
@@ -181,15 +181,18 @@ class CrfMetaDataMixin(models.Model):
     def _create_crf_entry(self, appointment, app_label, model_name,
                           entry_status=None, entry_order=None):
         appointment = self.get_base_appointment(appointment)
-        content_type_map = ContentTypeMap.objects.get(
-            app_label=app_label,
-            module_name=model_name.lower())
+        try:
+            content_type_map = ContentTypeMap.objects.get(
+                app_label=app_label,
+                module_name=model_name.lower())
+        except ContentTypeMap.DoesNotExist as e:
+            raise ContentTypeMap.DoesNotExist('{} See {}.{}'.format(str(e), app_label, model_name))
         return CrfEntry.objects.create(
             content_type_map=content_type_map,
             visit_definition=appointment.visit_definition,
             entry_order=entry_order or 0,
-            app_label=app_label.lower(),
-            model_name=model_name.lower(),
+            app_label=app_label,
+            model_name=model_name,
             default_entry_status=entry_status or NOT_REQUIRED,
             additional=True)
 
