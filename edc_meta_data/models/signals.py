@@ -23,36 +23,29 @@ def meta_data_on_post_save(sender, instance, raw, created, using, update_fields,
             # update rule groups through the rule group controller, instance is a visit_instance
             site_rule_groups.update_rules_for_source_model(RegisteredSubject, instance)
             site_rule_groups.update_rules_for_source_fk_model(RegisteredSubject, instance)
-
-            # call custom meta data changes on this visit tracking instance.
-            # see MetaDataMixin for visit model
             try:
-                instance.custom_post_update_crf_meta_data()
+                instance.custom_post_update_crf_meta_data()  # see CrfMetaDataMixin for visit model
             except AttributeError as e:
                 if 'custom_post_update_crf_meta_data' not in str(e):
                     raise AttributeError('Exception in {}.\'custom_post_update_crf_meta_data\'. Got {}'.format(
                         instance._meta.model_name, str(e)))
         else:
-            # These are subject models covered by a consent.
             try:
-                change_type = 'I'
-                if not created:
-                    change_type = 'U'
+                change_type = 'I' if created else 'U'
                 sender.entry_meta_data_manager.instance = instance
                 sender.entry_meta_data_manager.visit_instance = getattr(
                     instance, sender.entry_meta_data_manager.visit_attr_name)
                 try:
                     sender.entry_meta_data_manager.target_requisition_panel = getattr(instance, 'panel')
                 except AttributeError as e:
-                    pass
+                    if 'target_requisition_panel' in str(e):
+                        pass
                 sender.entry_meta_data_manager.update_meta_data(change_type)
                 if sender.entry_meta_data_manager.instance:
                     sender.entry_meta_data_manager.run_rule_groups()
             except AttributeError as e:
                 if 'entry_meta_data_manager' in str(e):
                     pass
-                else:
-                    raise
 
 
 @receiver(pre_delete, weak=False, dispatch_uid="meta_data_on_pre_delete")

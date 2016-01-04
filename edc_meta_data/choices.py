@@ -24,7 +24,7 @@ VISIT_INTERVAL_UNITS = (
     ('D', 'Day'),
     ('M', 'Month'),
     ('Y', 'Year'),
-    )
+)
 
 TAG_TYPE = (
     ('REGISTRATION', 'Registration'),

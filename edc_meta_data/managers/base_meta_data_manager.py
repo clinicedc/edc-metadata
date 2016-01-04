@@ -114,15 +114,11 @@ class BaseMetaDataManager(models.Manager):
             if self.instance or change_type in ['I', 'U', 'D'] or self.meta_data_instance.entry_status == KEYED:
                 new_status = KEYED  # (Insert, Update or no change (D or already KEYED)
                 try:
-                    self.meta_data_instance.report_datetime = self.instance.report_datetime
                     if change_type == 'D':
+                        new_status = self.get_default_entry_status()
                         self.meta_data_instance.report_datetime = None
-                        try:
-                            new_status = self.meta_data_instance.crf_entry.default_entry_status
-                        except AttributeError as e:
-                            if 'crf_entry' in str(e):
-                                new_status = self.meta_data_instance.lab_entry.default_entry_status
-                except AttributeError:  # instance is None
+                    self.meta_data_instance.report_datetime = self.instance.report_datetime
+                except AttributeError:
                     self.meta_data_instance.report_datetime = None
             elif change_type in [REQUIRED, NOT_REQUIRED]:  # coming from a rule, cannot change if KEYED
                 new_status = change_type
@@ -139,6 +135,14 @@ class BaseMetaDataManager(models.Manager):
         if change_type not in change_types:
             raise ValueError('Change type must be any of {0}. Got {1}'.format(change_types, change_type))
         self.update_meta_data(change_type)
+
+    def get_default_entry_status(self):
+        try:
+            default_entry_status = self.meta_data_instance.crf_entry.default_entry_status
+        except AttributeError as e:
+            if 'crf_entry' in str(e):
+                default_entry_status = self.meta_data_instance.lab_entry.default_entry_status
+        return default_entry_status
 
     def run_rule_groups(self):
         """Runs rule groups that use the data in this instance; that is, the model is a rule source model."""
