@@ -13,7 +13,7 @@ class RequisitionMetaDataAdmin(BaseModelAdmin):
     form = RequisitionMetaDataForm
     search_fields = (
         'registered_subject__subject_identifier', 'lab_entry__visit_definition__code',
-        'lab_entry__requisition_panel__name')
+        'lab_entry__requisition_panel__name', 'id')
     list_display = (
         'registered_subject', 'lab_entry', 'entry_status', 'fill_datetime', 'due_datetime', 'close_datetime')
     list_filter = (

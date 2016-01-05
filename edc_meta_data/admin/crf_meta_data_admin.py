@@ -13,7 +13,7 @@ class CrfMetaDataAdmin(BaseModelAdmin):
     form = CrfMetaDataForm
     search_fields = (
         'registered_subject__subject_identifier', 'crf_entry__visit_definition__code',
-        'entry__content_type_map__model', 'id')
+        'crf_entry__content_type_map__model', 'id')
     list_display = (
         'registered_subject', 'crf_entry', 'entry_status', 'fill_datetime',
         'due_datetime', 'close_datetime', 'created', 'hostname_created')
