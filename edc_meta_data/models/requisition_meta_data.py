@@ -3,10 +3,11 @@ from django.db import models
 from edc_appointment.models import Appointment
 
 from .base_meta_data import BaseMetaData
+from .base_meta_data_manager import BaseMetaDataManager
 from .lab_entry import LabEntry
 
 
-class NaturalKeyRequisitionMetaDataManager(models.Manager):
+class NaturalKeyRequisitionMetaDataManager(BaseMetaDataManager):
 
     def get_by_natural_key(self, visit_instance, visit_definition_code, subject_identifier_as_pk, code2, name):
         appointment = Appointment.objects.get_by_natural_key(

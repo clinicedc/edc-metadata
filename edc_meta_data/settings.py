@@ -44,7 +44,7 @@ INSTALLED_APPS = (
     'edc_consent',
     'edc_content_type_map',
     'edc_crypto_fields',
-    'edc.export',
+    'edc_export',
     'edc_lab.lab_clinic_api',
     'edc_meta_data',
     'edc_registration',

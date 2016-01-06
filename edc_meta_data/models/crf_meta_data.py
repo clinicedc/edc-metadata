@@ -4,10 +4,11 @@ from edc_appointment.models import Appointment
 
 from .base_meta_data import BaseMetaData
 
+from .base_meta_data_manager import BaseMetaDataManager
 from .crf_entry import CrfEntry
 
 
-class CrfMetaDataManager(models.Manager):
+class CrfMetaDataManager(BaseMetaDataManager):
 
     def get_by_natural_key(
             self, visit_instance, visit_definition_code, subject_identifier_as_pk, code2, app_label, model):
