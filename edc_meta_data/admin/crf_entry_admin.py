@@ -27,9 +27,4 @@ class CrfEntryInline (BaseTabularInline):
         'additional',
         'entry_category',
         'entry_window_calculation',
-        'time_point',
-        'lower_window',
-        'lower_window_unit',
-        'upper_window',
-        'upper_window_unit',
         'group_title')
