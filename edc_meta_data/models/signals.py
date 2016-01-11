@@ -9,6 +9,7 @@ from .crf_meta_data import CrfMetaData
 from .crf_meta_data_helper import CrfMetaDataHelper
 from .requisition_meta_data import RequisitionMetaData
 from .requisition_meta_data_helper import RequisitionMetaDataHelper
+from edc_constants.constants import DEAD, OFF_STUDY
 
 
 @receiver(post_save, weak=False, dispatch_uid="meta_data_on_post_save")
@@ -16,19 +17,24 @@ def meta_data_on_post_save(sender, instance, raw, created, using, update_fields,
     if not raw:
         if isinstance(instance, VisitModelMixin):
             # These are visit models
-            crf_meta_data_helper = CrfMetaDataHelper(instance.appointment, instance)
+            crf_meta_data_helper = CrfMetaDataHelper(instance.appointment, visit_instance=instance)
             crf_meta_data_helper.add_or_update_for_visit()
             requisition_meta_data_helper = RequisitionMetaDataHelper(instance.appointment, instance)
             requisition_meta_data_helper.add_or_update_for_visit()
             # update rule groups through the rule group controller, instance is a visit_instance
             site_rule_groups.update_rules_for_source_model(RegisteredSubject, instance)
             site_rule_groups.update_rules_for_source_fk_model(RegisteredSubject, instance)
-            try:
-                instance.custom_post_update_crf_meta_data()  # see CrfMetaDataMixin for visit model
-            except AttributeError as e:
-                if 'custom_post_update_crf_meta_data' not in str(e):
-                    raise AttributeError('Exception in {}.\'custom_post_update_crf_meta_data\'. Got {}'.format(
-                        instance._meta.model_name, str(e)))
+
+            instance = instance.custom_post_update_crf_meta_data()  # see CrfMetaDataMixin for visit model
+
+            if instance.survival_status == DEAD:
+                instance.require_death_report()
+            else:
+                instance.undo_require_death_report()
+            if instance.study_status == OFF_STUDY:
+                instance.require_off_study_report()
+            else:
+                instance.undo_require_off_study_report()
         else:
             try:
                 change_type = 'I' if created else 'U'

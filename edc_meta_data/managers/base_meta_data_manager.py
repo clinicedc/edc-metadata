@@ -3,7 +3,7 @@ from django.db import models
 
 from edc_appointment.models import Appointment
 from edc_base.utils import convert_from_camel
-from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, MISSED_VISIT, DEATH_VISIT, LOST_VISIT
+from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, MISSED_VISIT, LOST_VISIT
 
 
 class BaseMetaDataManager(models.Manager):
@@ -12,7 +12,7 @@ class BaseMetaDataManager(models.Manager):
     entry status of models for a given visit."""
     meta_data_model = None
     # list of visit reasons where meta data should not be created
-    skip_create_visit_reasons = [MISSED_VISIT, DEATH_VISIT, LOST_VISIT, 'vital status']
+    skip_create_visit_reasons = [MISSED_VISIT, LOST_VISIT, 'vital status']
     may_delete_entry_status = [REQUIRED, NOT_REQUIRED]
 
     def __init__(self, visit_model, visit_attr_name=None):
@@ -39,7 +39,6 @@ class BaseMetaDataManager(models.Manager):
     @instance.setter
     def instance(self, instance):
         self._instance = instance
-#         self.status = None  # this is weird
 
     @property
     def query_options(self):

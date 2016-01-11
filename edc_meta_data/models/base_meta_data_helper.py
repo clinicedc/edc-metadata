@@ -1,6 +1,7 @@
 from edc_base.utils import convert_from_camel
 from edc_constants.constants import REQUIRED, YES
 from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
+from django.core.exceptions import FieldError
 
 
 class BaseMetaDataHelper(object):
@@ -95,6 +96,9 @@ class BaseMetaDataHelper(object):
                     **model.entry_meta_data_manager.query_options)
             except model.DoesNotExist:
                 model.entry_meta_data_manager.instance = None
+            except FieldError as e:
+                raise FieldError(e, 'Try specifying the correct \'visit_attr_name\' when declaring '
+                                 'the entry_meta_data_manager on {}.'.format(model))
             model.entry_meta_data_manager.update_meta_data()
             if model.entry_meta_data_manager.instance:
                 model.entry_meta_data_manager.run_rule_groups()

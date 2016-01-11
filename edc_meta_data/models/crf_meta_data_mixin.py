@@ -1,5 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import models, transaction
+from django.db.models import get_model
+from django.db.utils import IntegrityError
 
 from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED
 from edc_content_type_map.models import ContentTypeMap
@@ -13,125 +15,178 @@ from .requisition_panel import RequisitionPanel
 
 class CrfMetaDataMixin(models.Model):
 
-    """Class to manipulate meta data for CRFs and requisitions."""
+    """Class to manipulate meta data after entry_meta_data_manager for CRFs and requisitions."""
+
+    def __init__(self, *args, **kwargs):
+        try:
+            self.death_report_model = get_model(*self.death_report_model)
+        except (TypeError, AttributeError):
+            pass
+        super(CrfMetaDataMixin, self).__init__(*args, **kwargs)
 
     def custom_post_update_crf_meta_data(self):
-        raise ImproperlyConfigured(
-            'To use the MetaDataMixin override method \'custom_post_update_crf_meta_data\'')
+        return self
 
-    def crf_is_required(self, appointment, app_label, model_name,
-                        message=None, create=None):
-        """Saves the CRF status as REQUIRED."""
-        self._change_crf_status(
-            REQUIRED, appointment, app_label, model_name, message, create)
+    def crf_is_required(self, appointment, app_label, model_name, create=None):
+        """Sets the CRF status to REQUIRED."""
+        return self.change_crf_status(
+            REQUIRED, appointment, app_label, model_name, create)
 
-    def crf_is_not_required(self, appointment, app_label, model_name, message=None):
-        """Saves the CRF status as NOT REQUIRED."""
-        self._change_crf_status(
-            NOT_REQUIRED, appointment, app_label, model_name, message)
+    def crf_is_not_required(self, appointment, app_label, model_name, delete=None):
+        """Sets the CRF status to NOT REQUIRED."""
+        crf_meta_data = None
+        if delete:
+            try:
+                obj = CrfMetaData.objects.get(
+                    crf_entry__app_label=app_label,
+                    crf_entry__model_name=model_name,
+                    appointment=self.get_base_appointment(appointment),
+                    entry_status__in=[REQUIRED, NOT_REQUIRED])
+                obj.delete()
+            except CrfMetaData.DoesNotExist:
+                pass
+        else:
+            crf_meta_data = self.change_crf_status(
+                NOT_REQUIRED, appointment, app_label, model_name)
+        return crf_meta_data
 
-    def requisition_is_required(self, appointment, app_label, model_name, panel_name,
-                                message=None, create=None):
-        self._change_requisition_status(
-            REQUIRED, appointment, app_label, model_name, panel_name, message, create)
+    def requisition_is_required(self, appointment, app_label, model_name, panel_name, create=None):
+        """Sets the Requisition status to REQUIRED."""
+        self.change_requisition_status(
+            REQUIRED, appointment, app_label, model_name, panel_name, create)
 
-    def requisition_is_not_required(self, appointment, app_label, model_name, panel_name,
-                                    message=None):
-        self._change_requisition_status(
-            NOT_REQUIRED, appointment, app_label, model_name, panel_name, message)
+    def requisition_is_not_required(self, appointment, app_label, model_name, panel_name, delete=None):
+        """Sets the Requisition status to NOT REQUIRED."""
+        self.change_requisition_status(
+            NOT_REQUIRED, appointment, app_label, model_name, panel_name)
+        if delete:
+            RequisitionMetaData.objects.filter(
+                lab_entry__app_label=app_label,
+                lab_entry__model_name=model_name,
+                appointment=self.get_base_appointment(appointment),
+                lab_entry__requisition_panel__name=panel_name,
+                entry_status__in=[REQUIRED, NOT_REQUIRED])
 
-    def change_to_off_study_visit(self, appointment, off_study_app_label,
-                                  off_study_model_name, message=None):
+    def require_off_study_report(self):
         """Changes the meta data so that only the off study form is required.
 
         * if the off study form does not exist it will be created.
         * if a form is already KEYED it will not be changed.
+        * if visit.require_crfs, then only the off study meta data is changed.
         """
-        self._change_all_to_not_required(appointment)
-        self.crf_is_required(appointment, off_study_app_label, off_study_model_name,
-                             message, create=True)
+        app_label = self.off_study_model._meta.app_label
+        model_name = self.off_study_model._meta.model_name
+        content_type_map = ContentTypeMap.objects.get(app_label=app_label, module_name=model_name)
+        with transaction.atomic():
+            try:
+                CrfEntry.objects.create(
+                    content_type_map=content_type_map,
+                    visit_definition=self.appointment.visit_definition,
+                    entry_order=0,
+                    app_label=app_label,
+                    model_name=model_name,
+                    default_entry_status=REQUIRED,
+                    additional=True)
+            except IntegrityError:
+                pass
+        if self.require_crfs:
+            self.change_all_to_not_required()
+        self.crf_is_required(
+            self.appointment, app_label, model_name, create=True)
 
-    def change_to_death_visit(self, appointment, app_label, off_study_model_name,
-                              death_model_name, message=None):
+    def require_death_report(self):
         """Changes the meta data so that only the death and
-        off study forms are required.
+        off study forms are required, unless require_crfs is True."""
+        app_label = self.death_report_model._meta.app_label
+        model_name = self.death_report_model._meta.model_name
+        content_type_map = ContentTypeMap.objects.get(app_label=app_label, module_name=model_name)
+        with transaction.atomic():
+            try:
+                CrfEntry.objects.create(
+                    content_type_map=content_type_map,
+                    visit_definition=self.appointment.visit_definition,
+                    entry_order=0,
+                    app_label=app_label,
+                    model_name=model_name,
+                    default_entry_status=REQUIRED,
+                    additional=True)
+            except IntegrityError:
+                pass
+        self.crf_is_required(
+            self.appointment, app_label, model_name, create=True)
 
-        If either form does not exist they will be created."""
-        self.change_to_off_study_visit(appointment, app_label, off_study_model_name, message)
-        self.crf_is_required(appointment, app_label, death_model_name, message, create=True)
+    def undo_require_off_study_report(self):
+        off_study_app_label = self.off_study_model._meta.app_label
+        off_study_model_name = self.off_study_model._meta.model_name
+        self.crf_is_not_required(
+            self.appointment, off_study_app_label, off_study_model_name, delete=True)
 
-    def change_to_unscheduled_visit(self, appointment, message=None):
+    def undo_require_death_report(self):
+        app_label = self.death_report_model._meta.app_label
+        death_model_name = self.death_report_model._meta.model_name
+        self.crf_is_not_required(self.appointment, app_label, death_model_name, delete=True)
+
+    def change_to_unscheduled_visit(self, appointment):
         """Changes all meta data to not required."""
-        self._change_all_to_not_required(appointment)
+        self.change_all_to_not_required()
 
-    def _change_all_to_not_required(self, appointment):
+    def change_all_to_not_required(self):
         """Changes all meta data to not required."""
-        base_appointment = self.get_base_appointment(appointment)
-        CrfMetaData.objects.filter(
-            appointment=base_appointment,
-            registered_subject=appointment.registered_subject).exclude(
-                entry_status__in=[NOT_REQUIRED, KEYED]).update(
-                entry_status=NOT_REQUIRED)
-        RequisitionMetaData.objects.filter(
-            appointment=base_appointment,
-            registered_subject=appointment.registered_subject).exclude(
-                entry_status__in=[NOT_REQUIRED, KEYED]).update(
-                entry_status=NOT_REQUIRED)
-
-    def _change_crf_status(self, entry_status, appointment, app_label, model_name,
-                           message=None, create=None):
-        """Changes a CRF's entry status.
-
-        Raises an error if the CRF does not exist unless 'create'
-        is True. Except for OFF STUDY there should not be a need
-        to create a CRF."""
-        try:
-            base_appointment = self.get_base_appointment(appointment)
-            crf_meta_data = CrfMetaData.objects.get(
-                crf_entry__app_label=app_label,
-                crf_entry__model_name=model_name,
-                appointment=base_appointment
-            )
-        except CrfMetaData.DoesNotExist as e:
-            if create:
-                crf_meta_data = self._create_crf(appointment, app_label, model_name)
-            else:
-                message = message or ''
-                raise CrfMetaData.DoesNotExist(
-                    '{} {}.{} {}'.format(str(e), app_label, model_name, message))
-        self._change_status(crf_meta_data, entry_status)
-
-    def _change_requisition_status(
-            self, entry_status, appointment, app_label, model_name, panel_name,
-            message=None, create=None):
-        """Changes a requisition's entry status.
-
-        Raises an error if the requisition does not exist unless 'create' is True."""
-        try:
-            base_appointment = self.get_base_appointment(appointment)
-            requisition_meta_data = RequisitionMetaData.objects.get(
-                lab_entry__app_label=app_label,
-                lab_entry__model_name=model_name,
+        with transaction.atomic():
+            base_appointment = self.get_base_appointment(self.appointment)
+            CrfMetaData.objects.filter(
                 appointment=base_appointment,
-                lab_entry__requisition_panel__name=panel_name
-            )
-        except RequisitionMetaData.DoesNotExist as e:
-            if create:
-                requisition_meta_data = self._create_crf(appointment, app_label, model_name)
-            else:
-                message = message or ''
-                raise RequisitionMetaData.DoesNotExist(
-                    '{} {}.{}.{} {}'.format(str(e), app_label, model_name, panel_name, message))
-        self._change_status(requisition_meta_data, entry_status)
+                registered_subject=self.appointment.registered_subject).exclude(
+                    entry_status__in=[NOT_REQUIRED, KEYED]).exclude(
+                        crf_entry__model_name=self.death_report_model._meta.model_name).update(
+                    entry_status=NOT_REQUIRED)
+            RequisitionMetaData.objects.filter(
+                appointment=base_appointment,
+                registered_subject=self.appointment.registered_subject).exclude(
+                    entry_status__in=[NOT_REQUIRED, KEYED]).update(
+                    entry_status=NOT_REQUIRED)
 
-    def _change_status(self, meta_data, entry_status):
-        """Changes the entry_status if not already set to the given value."""
-        if meta_data.entry_status != entry_status:
-            meta_data.entry_status = entry_status
-            meta_data.save()
+    def change_crf_status(self, entry_status, appointment, app_label, model_name, create=None):
+        """Toggles a CRF's entry status between REQUIRED / NOT REQUIRED."""
+        crf_meta_data = None
+        if entry_status in [REQUIRED, NOT_REQUIRED]:
+            with transaction.atomic():
+                try:
+                    crf_meta_data = CrfMetaData.objects.get(
+                        crf_entry__app_label=app_label,
+                        crf_entry__model_name=model_name,
+                        appointment=self.get_base_appointment(appointment),
+                        entry_status__in=[x for x in [REQUIRED, NOT_REQUIRED] if x != entry_status])
+                    crf_meta_data.entry_status = entry_status
+                    crf_meta_data.save()
+                except CrfMetaData.DoesNotExist:
+                    if create:
+                        crf_meta_data = self.create_crf_meta_data(
+                            appointment, app_label, model_name, entry_status)
+        return crf_meta_data
 
-    def _create_crf(self, appointment, app_label, model_name):
-        """Creates a CrfMetaData with entry_status REQUIRED."""
+    def change_requisition_status(
+            self, entry_status, appointment, app_label, model_name, panel_name, create=None):
+        """Toggles a Requisition's entry status between REQUIRED / NOT REQUIRED."""
+        if entry_status in [REQUIRED, NOT_REQUIRED]:
+            try:
+                requisition_meta_data = RequisitionMetaData.objects.get(
+                    lab_entry__app_label=app_label,
+                    lab_entry__model_name=model_name,
+                    appointment=self.get_base_appointment(appointment),
+                    lab_entry__requisition_panel__name=panel_name,
+                    entry_status__in=[x for x in [REQUIRED, NOT_REQUIRED] if x != entry_status])
+                requisition_meta_data.entry_status = entry_status
+                requisition_meta_data.save()
+            except RequisitionMetaData.DoesNotExist:
+                if create:
+                    requisition_meta_data = self.create_requisition_meta_data(
+                        appointment, app_label, model_name, panel_name,
+                        entry_status)
+
+    def create_crf_meta_data(self, appointment, app_label, model_name, entry_status):
+        """Creates or updates existing CRF meta data to given entry_status."""
+        crf_entry = None
         base_appointment = self.get_base_appointment(appointment)
         try:
             crf_entry = CrfEntry.objects.get(
@@ -139,16 +194,21 @@ class CrfMetaDataMixin(models.Model):
                 model_name=model_name,
                 visit_definition=base_appointment.visit_definition)
         except CrfEntry.DoesNotExist:
-            crf_entry = self._create_crf_entry(appointment, app_label, model_name, REQUIRED)
-        crf_meta_data = CrfMetaData.objects.create(
-            crf_entry=crf_entry,
-            appointment=base_appointment,
-            registered_subject=base_appointment.registered_subject,
-            entry_status=REQUIRED)
+            raise ImproperlyConfigured('Crf Entry does not exist. Check AppConfiguration. Got {}.{}.'.format(
+                app_label, model_name))
+        try:
+            crf_meta_data = CrfMetaData.objects.create(
+                crf_entry=crf_entry,
+                appointment=base_appointment,
+                registered_subject=base_appointment.registered_subject,
+                entry_status=entry_status)
+        except IntegrityError:
+            crf_meta_data = None
         return crf_meta_data
 
-    def _create_requisition(self, appointment, app_label, model_name, panel_name):
-        """Creates a requisition with entry status set to REQUIRED."""
+    def create_requisition_meta_data(self, appointment, app_label, model_name, panel_name, entry_status):
+        """Creates or updates existing requisition meta data to given entry_status."""
+        lab_entry = None
         base_appointment = self.get_base_appointment(appointment)
         requisition_panel = RequisitionPanel.objects.get(panel_name=panel_name)
         try:
@@ -157,17 +217,20 @@ class CrfMetaDataMixin(models.Model):
                 requisition_panel=requisition_panel,
                 visit_definition=base_appointment.visit_definition)
         except LabEntry.DoesNotExist:
-            lab_entry = self._create_lab_entry(
-                appointment, app_label, model_name, requisition_panel, REQUIRED)
-        requisition_meta_data = RequisitionMetaData.objects.create(
-            lab_entry=lab_entry,
-            appointment=base_appointment,
-            lab_entry__requisition_panel=requisition_panel)
+            raise ImproperlyConfigured('Lab Entry does not exist. Check AppConfiguration. Got {}.{} panel {}.'.format(
+                app_label, model_name, requisition_panel.name))
+        try:
+            requisition_meta_data = RequisitionMetaData.objects.create(
+                lab_entry=lab_entry,
+                appointment=base_appointment,
+                lab_entry__requisition_panel=requisition_panel,
+                entry_status=entry_status)
+        except IntegrityError:
+            requisition_meta_data = None
         return requisition_meta_data
 
     def get_base_appointment(self, appointment):
-        """Returns the base appointment (CODE.0) or the given appointment
-        if it is the base.
+        """Returns the base appointment (CODE.0).
 
         More than one appointments may span for a given visit code.
         The appointments are incremented using a decimal, e.g. 1000.0,
@@ -177,36 +240,6 @@ class CrfMetaDataMixin(models.Model):
                 registered_subject=appointment.registered_subject,
                 visit_instance='0', visit_definition=appointment.visit_definition)
         return appointment
-
-    def _create_crf_entry(self, appointment, app_label, model_name,
-                          entry_status=None, entry_order=None):
-        appointment = self.get_base_appointment(appointment)
-        try:
-            content_type_map = ContentTypeMap.objects.get(
-                app_label=app_label,
-                module_name=model_name.lower())
-        except ContentTypeMap.DoesNotExist as e:
-            raise ContentTypeMap.DoesNotExist('{} See {}.{}'.format(str(e), app_label, model_name))
-        return CrfEntry.objects.create(
-            content_type_map=content_type_map,
-            visit_definition=appointment.visit_definition,
-            entry_order=entry_order or 0,
-            app_label=app_label,
-            model_name=model_name,
-            default_entry_status=entry_status or NOT_REQUIRED,
-            additional=True)
-
-    def _create_lab_entry(self, appointment, app_label, model_name, requisition_panel,
-                          entry_status=None, entry_order=None):
-        appointment = self.get_base_appointment(appointment)
-        return LabEntry.objects.create(
-            app_label=app_label,
-            model_name=model_name,
-            requisition_panel=requisition_panel,
-            visit_definition=appointment.visit_definition,
-            entry_order=entry_order or 0,
-            default_entry_status=entry_status or NOT_REQUIRED,
-            additional=True)
 
     class Meta:
         abstract = True

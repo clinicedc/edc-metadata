@@ -8,7 +8,6 @@ from edc_testing.tests.factories import TestScheduledModel1Factory, TestRequisit
 
 from .base_test_case import BaseTestCase
 from django.utils import timezone
-from edc_meta_data.models.crf_entry import CrfEntry
 
 
 class TestMetaData(BaseTestCase):
@@ -159,7 +158,7 @@ class TestMetaData(BaseTestCase):
             appointment=self.appointment,
             report_datetime=timezone.now())
         self.assertEqual(CrfMetaData.objects.filter(registered_subject=self.registered_subject).count(), 3)
-        TestScheduledModel1Factory(test_visit=test_visit)
+        TestScheduledModel1.objects.create(test_visit=test_visit)
         self.assertEqual(CrfMetaData.objects.filter(
             entry_status=KEYED, registered_subject=self.registered_subject).count(), 1)
         self.assertEqual(CrfMetaData.objects.filter(

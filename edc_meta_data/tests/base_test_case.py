@@ -4,7 +4,7 @@ from django.utils import timezone
 from edc.subject.lab_tracker.classes import site_lab_tracker
 from edc_appointment.models import Appointment
 from edc_consent.models.consent_type import ConsentType
-from edc_constants.constants import MALE, SCHEDULED
+from edc_constants.constants import MALE, SCHEDULED, ON_STUDY, ALIVE
 from edc_lab.lab_profile.classes import site_lab_profiles
 from edc_lab.lab_profile.exceptions import AlreadyRegistered as AlreadyRegisteredLabProfile
 from edc_registration.tests.factories import RegisteredSubjectFactory
@@ -14,6 +14,7 @@ from edc_testing.models import TestVisit
 from edc_visit_schedule.models import VisitDefinition
 
 from .test_visit_schedule import VisitSchedule
+from edc_testing.models.test_death_report import TestDeathReport
 
 
 class BaseTestCase(TestCase):
@@ -49,9 +50,12 @@ class BaseTestCase(TestCase):
         appointment = Appointment.objects.get(
             registered_subject=registered_subject,
             visit_definition=visit_definition)
+        TestVisit.death_report_model = TestDeathReport
         TestVisit.objects.create(
             appointment=appointment,
             report_datetime=timezone.now(),
+            study_status=ON_STUDY,
+            survival_status=ALIVE,
             reason=SCHEDULED)
 
         # create a subject tow, for the tests
