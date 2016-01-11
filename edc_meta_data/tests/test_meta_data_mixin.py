@@ -31,7 +31,7 @@ class TestMetaDataMixin(BaseTestCase):
 
     def test_change_to_off_study(self):
         """Assert changing to death visit adds off study and sets all others to not required."""
-        visit = TestVisit.objects.create(
+        TestVisit.objects.create(
             appointment=self.appointment,
             report_datetime=timezone.now(),
             study_status=OFF_STUDY,
@@ -47,7 +47,7 @@ class TestMetaDataMixin(BaseTestCase):
 
     def test_change_to_off_study_creates_entry(self):
         """Assert changing to off study creates an Entry for off study."""
-        visit = TestVisit.objects.create(
+        TestVisit.objects.create(
             appointment=self.appointment,
             report_datetime=timezone.now(),
             study_status=OFF_STUDY,
@@ -73,7 +73,7 @@ class TestMetaDataMixin(BaseTestCase):
 
     def test_require_death_report_require_crfs(self):
         """Assert changing to death visit adds offstudy and death and sets all others to not required."""
-        visit = TestVisit.objects.create(
+        TestVisit.objects.create(
             appointment=self.appointment,
             report_datetime=timezone.now(),
             survival_status=DEAD,
@@ -86,7 +86,7 @@ class TestMetaDataMixin(BaseTestCase):
 
     def test_require_death_report_creates_entry(self):
         """Assert changing to off study creates an Entry for death report."""
-        visit = TestVisit.objects.create(
+        TestVisit.objects.create(
             appointment=self.appointment,
             report_datetime=timezone.now(),
             survival_status=DEAD,
