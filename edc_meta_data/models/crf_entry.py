@@ -23,7 +23,7 @@ class CrfEntry(BaseUuidModel):
 
     """Links a model to a visit definition.
 
-    The model class it links to must have the EntryMetaDataManager defined, see exception in save. """
+    The model class it links to must have the CrfMetaDataManager defined, see exception in save. """
 
     visit_definition = models.ForeignKey(VisitDefinition)
 
@@ -76,7 +76,7 @@ class CrfEntry(BaseUuidModel):
         except AttributeError:
             raise MetaDataManagerError(
                 'Models linked by the Entry class require a meta data manager. '
-                'Add entry_meta_data_manager=EntryMetaDataManager() to model {0}.{1}'.format(
+                'Add entry_meta_data_manager=CrfMetaDataManager(VisitModel) to model {0}.{1}'.format(
                     self.app_label, self.model_name))
         super(CrfEntry, self).save(*args, **kwargs)
 
