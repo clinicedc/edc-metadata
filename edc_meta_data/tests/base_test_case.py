@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from edc_appointment.models import Appointment
+from edc_base.utils import edc_base_startup
 from edc_consent.models.consent_type import ConsentType
 from edc_constants.constants import MALE, SCHEDULED, ON_STUDY, ALIVE
 from edc_lab.lab_profile.classes import site_lab_profiles
@@ -9,16 +10,16 @@ from edc_lab.lab_profile.exceptions import AlreadyRegistered as AlreadyRegistere
 from edc_registration.tests.factories import RegisteredSubjectFactory
 from edc_testing.classes import TestLabProfile, TestAppConfiguration
 from edc_testing.tests.factories import TestConsentWithMixinFactory
-from edc_testing.models import TestVisit
+from edc_testing.models import TestVisit, TestDeathReport
 from edc_visit_schedule.models import VisitDefinition
 
 from .test_visit_schedule import VisitSchedule
-from edc_testing.models.test_death_report import TestDeathReport
 
 
 class BaseTestCase(TestCase):
 
     def setUp(self):
+        edc_base_startup()
         try:
             site_lab_profiles.register(TestLabProfile())
         except AlreadyRegisteredLabProfile:
