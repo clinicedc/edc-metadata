@@ -1,6 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models, transaction
-from django.db.models import get_model
 from django.db.utils import IntegrityError
 
 from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED
@@ -16,13 +15,6 @@ from .requisition_panel import RequisitionPanel
 class CrfMetaDataMixin(models.Model):
 
     """Class to manipulate meta data after entry_meta_data_manager for CRFs and requisitions."""
-
-    def __init__(self, *args, **kwargs):
-        try:
-            self.death_report_model = get_model(*self.death_report_model)
-        except (TypeError, AttributeError):
-            pass
-        super(CrfMetaDataMixin, self).__init__(*args, **kwargs)
 
     def custom_post_update_crf_meta_data(self):
         return self
