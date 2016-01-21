@@ -36,8 +36,11 @@ def meta_data_on_post_save(sender, instance, raw, created, using, update_fields,
                     instance.require_off_study_report()
                 else:
                     instance.undo_require_off_study_report()
-            except AttributeError:
-                pass
+            except AttributeError as e:
+                if 'death_report_model' in str(e):
+                    pass
+                else:
+                    raise
         else:
             try:
                 change_type = 'I' if created else 'U'
