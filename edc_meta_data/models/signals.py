@@ -27,20 +27,14 @@ def meta_data_on_post_save(sender, instance, raw, created, using, update_fields,
 
             instance = instance.custom_post_update_crf_meta_data()  # see CrfMetaDataMixin for visit model
 
-            try:
-                if instance.survival_status == DEAD:
-                    instance.require_death_report()
-                else:
-                    instance.undo_require_death_report()
-                if instance.study_status == OFF_STUDY:
-                    instance.require_off_study_report()
-                else:
-                    instance.undo_require_off_study_report()
-            except AttributeError as e:
-                if 'death_report_model' in str(e):
-                    pass
-                else:
-                    raise AttributeError(e)
+            if instance.survival_status == DEAD:
+                instance.require_death_report()
+            else:
+                instance.undo_require_death_report()
+            if instance.study_status == OFF_STUDY:
+                instance.require_off_study_report()
+            else:
+                instance.undo_require_off_study_report()
         else:
             try:
                 change_type = 'I' if created else 'U'

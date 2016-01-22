@@ -108,15 +108,23 @@ class CrfMetaDataMixin(models.Model):
             self.appointment, app_label, model_name, create=True)
 
     def undo_require_off_study_report(self):
+        """Revert off study CRF to not required.
+
+        off_study_model attr is always set.
+        """
         off_study_app_label = self.off_study_model._meta.app_label
         off_study_model_name = self.off_study_model._meta.model_name
         self.crf_is_not_required(
             self.appointment, off_study_app_label, off_study_model_name, delete=True)
 
     def undo_require_death_report(self):
-        app_label = self.death_report_model._meta.app_label
-        death_model_name = self.death_report_model._meta.model_name
-        self.crf_is_not_required(self.appointment, app_label, death_model_name, delete=True)
+        """Revert death report CRF to not required.
+
+        death_report_model attr is NOT always set."""
+        if self.death_report_model:
+            app_label = self.death_report_model._meta.app_label
+            death_model_name = self.death_report_model._meta.model_name
+            self.crf_is_not_required(self.appointment, app_label, death_model_name, delete=True)
 
     def change_to_unscheduled_visit(self, appointment):
         """Changes all meta data to not required."""
