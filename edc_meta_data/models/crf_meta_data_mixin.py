@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 
-from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED
+from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, NO
 from edc_content_type_map.models import ContentTypeMap
 
 from .crf_entry import CrfEntry
@@ -81,7 +81,7 @@ class CrfMetaDataMixin(models.Model):
                     additional=True)
             except IntegrityError:
                 pass
-        if self.require_crfs:
+        if self.require_crfs == NO:
             self.change_all_to_not_required()
         self.crf_is_required(
             self.appointment, app_label, model_name, create=True)

@@ -3,7 +3,7 @@ from __future__ import print_function
 from django.utils import timezone
 
 from edc_constants.constants import (
-    SCHEDULED, NOT_REQUIRED, REQUIRED, KEYED, NEW, DEAD,
+    SCHEDULED, NOT_REQUIRED, REQUIRED, KEYED, NEW, DEAD, NO, YES,
     COMPLETED_PROTOCOL_VISIT, OFF_STUDY, ALIVE, ON_STUDY)
 from edc_meta_data.models import CrfMetaData, CrfEntry
 from edc_testing.models import TestVisit, TestOffStudy, TestDeathReport
@@ -35,7 +35,8 @@ class TestMetaDataMixin(BaseTestCase):
             appointment=self.appointment,
             report_datetime=timezone.now(),
             study_status=OFF_STUDY,
-            reason=COMPLETED_PROTOCOL_VISIT)
+            reason=COMPLETED_PROTOCOL_VISIT,
+            require_crfs=NO)
         self.assertEqual(
             CrfMetaData.objects.filter(
                 registered_subject=self.appointment.registered_subject,
@@ -65,7 +66,8 @@ class TestMetaDataMixin(BaseTestCase):
             report_datetime=timezone.now(),
             survival_status=DEAD,
             study_status=OFF_STUDY,
-            reason=COMPLETED_PROTOCOL_VISIT)
+            reason=COMPLETED_PROTOCOL_VISIT,
+            require_crfs=NO)
         self.assertEqual(
             [obj.entry_status for obj in CrfMetaData.objects.filter(
                 registered_subject=self.appointment.registered_subject)],
@@ -177,3 +179,21 @@ class TestMetaDataMixin(BaseTestCase):
             content_type_map__module_name='testdeathreport')
         self.assertEqual(
             CrfMetaData.objects.filter(crf_entry=crf_entry).count(), 1)
+
+    def test_completed_protocol(self):
+        """Assert that if reason is completed protocol and crfs are being submitted then offstudy and all
+        other crf are required.."""
+        TestVisit.objects.create(
+            appointment=self.appointment,
+            report_datetime=timezone.now(),
+            study_status=OFF_STUDY,
+            reason=COMPLETED_PROTOCOL_VISIT,
+            require_crfs=YES)
+        self.assertEqual(
+            CrfMetaData.objects.filter(
+                registered_subject=self.appointment.registered_subject,
+                entry_status=REQUIRED).count(), 4)
+        self.assertEqual(
+            [obj.entry_status for obj in CrfMetaData.objects.filter(
+                registered_subject=self.appointment.registered_subject)],
+            [REQUIRED, REQUIRED, REQUIRED, REQUIRED])
