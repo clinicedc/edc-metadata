@@ -1,7 +1,7 @@
 from edc_base.utils import convert_from_camel
 from edc_constants.constants import REQUIRED, YES
 from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
 
 
 class BaseMetaDataHelper(object):
@@ -73,13 +73,10 @@ class BaseMetaDataHelper(object):
             no_follow_up_reasons = VISIT_REASON_NO_FOLLOW_UP_CHOICES
         show_entries = self.visit_instance.reason not in no_follow_up_reasons
         if self.visit_instance.reason in self.visit_instance.get_off_study_reason():
-            off_study_model = self.visit_instance.off_study_model
             try:
-                options = {'{}'.format(off_study_model.visit_model_attr): self.visit_instance}
-                off_study_instance = off_study_model.objects.get(**options)
-                show_entries = off_study_instance.has_scheduled_data == YES
-            except off_study_model.DoesNotExist:
-                pass
+                show_entries = self.visit_instance.require_crfs == YES
+            except self.Visit_model.DoesNotExist:
+                raise ValidationError('Visit report is required.')
         return show_entries
 
     def add_or_update_for_visit(self):
