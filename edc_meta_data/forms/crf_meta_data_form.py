@@ -14,3 +14,4 @@ class CrfMetaDataForm (forms.ModelForm):
 
     class Meta:
         model = CrfMetaData
+        fields = '__all__'

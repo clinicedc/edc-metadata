@@ -1,5 +1,8 @@
 from django.db import models
-from django.db.models import get_model
+try:
+    from django.db import models as apps
+except:
+    from django.apps import apps
 
 from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
@@ -55,7 +58,7 @@ class LabEntry(BaseUuidModel):
     objects = LabEntryManager()
 
     def save(self, *args, **kwargs):
-        model = get_model(self.app_label, self.model_name)
+        model = apps.get_model(self.app_label, self.model_name)
         if not model:
             raise TypeError('Lab Entry \'{2}\' cannot determine requisition_panel model '
                             'from app_label=\'{0}\' and model_name=\'{1}\''.format(
@@ -73,7 +76,7 @@ class LabEntry(BaseUuidModel):
         return self.visit_definition.natural_key() + self.requisition_panel.natural_key()
 
     def get_model(self):
-        return get_model(self.app_label, self.model_name)
+        return apps.get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name
