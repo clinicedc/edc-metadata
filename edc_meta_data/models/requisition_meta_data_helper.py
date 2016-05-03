@@ -1,6 +1,6 @@
-from ..models import RequisitionMetaData, LabEntry
-
 from .base_meta_data_helper import BaseMetaDataHelper
+from .lab_entry import LabEntry
+from .requisition_meta_data import RequisitionMetaData
 
 
 class RequisitionMetaDataHelper(BaseMetaDataHelper):
