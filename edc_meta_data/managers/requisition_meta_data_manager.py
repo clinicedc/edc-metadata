@@ -53,7 +53,7 @@ class RequisitionMetaDataManager(BaseMetaDataManager):
                     app_label=self.model._meta.app_label.lower(),
                     model_name=self.model._meta.object_name.lower(),
                     visit_definition=self.visit_instance.appointment.visit_definition,
-                    requisition_panel__name=self.target_requisition_panel,
+                    requisition_panel__name=self.target_requisition_panel.name,
                 )
             except self.entry_model.DoesNotExist:
                 raise ImproperlyConfigured('LabEntry matching query does not exist. Model {0}.Check your'
