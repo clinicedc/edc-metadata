@@ -40,7 +40,7 @@ class RequisitionMetaDataManager(BaseMetaDataManager):
         return {'appointment': self.visit_instance.appointment,
                 '{0}__app_label'.format(self.entry_attr): self.model._meta.app_label,
                 '{0}__model_name'.format(self.entry_attr): self.model._meta.object_name.lower(),
-                '{0}__requisition_panel__name__iexact'.format(self.entry_attr): self.target_requisition_panel}
+                '{0}__requisition_panel__name__iexact'.format(self.entry_attr): self.target_requisition_panel.name.lower()}
 
     def create_meta_data(self):
         """Creates a meta_data instance for the model at the
