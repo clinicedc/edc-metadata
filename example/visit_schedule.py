@@ -3,6 +3,7 @@ from edc_constants.constants import REQUIRED, NOT_ADDITIONAL
 from edc_visit_schedule.visit_schedule_configuration import (
     VisitScheduleConfiguration, CrfTuple, RequisitionPanelTuple, MembershipFormTuple, ScheduleTuple)
 from example.models import SubjectVisit, SubjectConsent
+from edc_visit_schedule.site_visit_schedules import site_visit_schedules
 
 
 entries = (
@@ -67,3 +68,4 @@ class VisitSchedule(VisitScheduleConfiguration):
             'entries': entries},
          },
     )
+site_visit_schedules.register(VisitSchedule)

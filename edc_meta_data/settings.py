@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'edc_content_type_map.apps.EdcContentTypeAppConfig',
     'edc_visit_schedule.apps.EdcVisitScheduleAppConfig',
     'edc_meta_data.apps.EdcMetaDataAppConfig',
+    'example.apps.EdcConsentAppConfig',
     'example.apps.ExampleAppConfig'
 ]
 
