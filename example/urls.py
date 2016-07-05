@@ -1,14 +1,21 @@
-from django.conf.urls import include, url
+"""x URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/1.9/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.conf.urls import url, include
+    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+"""
+from django.conf.urls import url
 from django.contrib import admin
-# from example.views import HomeView
 
 urlpatterns = [
-    url(r'^edc-appointment/', include('edc_appointment.urls')),
-    url(r'^edc-visit-schedule/', include('edc_visit_schedule.urls')),
-    url(r'^edc-content-type-map/', include('edc_content_type_map.urls')),
-    url(r'^edc-meta-data/', include('edc_meta_data.urls')),
-    url(r'^django-crypto-fields/', include('django_crypto_fields.urls')),
-    url(r'^edc/', include('edc_base.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    # url(r'', HomeView.as_view(), name='home_url'),
+    url(r'^admin/', admin.site.urls),
 ]

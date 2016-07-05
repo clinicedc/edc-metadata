@@ -9,6 +9,9 @@ To install:
 
 To configure:
 
+`edc-meta-data` works together with `edc-visit-schedule`.
+
+
 Meta data is collected in two models which have to be declared manually in your application:
 
     class CrfMetaData(CrfMetaDataModelMixin, BaseUuidModel):

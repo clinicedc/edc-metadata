@@ -1,6 +1,6 @@
 from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models, transaction
+from django.db import transaction
 from django.db.utils import IntegrityError
 
 from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, NO
@@ -9,7 +9,7 @@ from edc_content_type_map.models import ContentTypeMap
 from .models import CrfEntry, LabEntry, RequisitionPanel
 
 
-class CrfMetaDataMixin(models.Model):
+class CrfMetaDataMixin:
 
     """Class for visit model to manipulate meta data after entry_meta_data_manager for CRFs and requisitions.
 
@@ -253,6 +253,3 @@ class CrfMetaDataMixin(models.Model):
                 registered_subject=appointment.registered_subject,
                 visit_instance='0', visit_definition=appointment.visit_definition)
         return appointment
-
-    class Meta:
-        abstract = True

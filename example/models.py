@@ -8,6 +8,7 @@ from edc_registration.models import RegisteredSubjectModelMixin
 from edc_visit_tracking.models.crf_model_mixin import CrfModelMixin
 from edc_visit_tracking.models.previous_visit_mixin import PreviousVisitMixin
 from edc_visit_tracking.models.visit_model_mixin import VisitModelMixin
+from edc_meta_data.model_mixins import CrfMetaDataModelMixin, RequisitionMetaDataModelMixin
 
 
 class RegisteredSubject(RegisteredSubjectModelMixin):
@@ -39,6 +40,26 @@ class CrfOne(CrfModelMixin, BaseUuidModel):
     f1 = models.CharField(max_length=10, default='erik')
 
     entry_meta_data_manager = CrfMetaDataManager(SubjectVisit)
+
+    class Meta:
+        app_label = 'example'
+
+
+class CrfMetaData(CrfMetaDataModelMixin, BaseUuidModel):
+
+    registered_subject = models.ForeignKey(RegisteredSubject)
+
+    appointment = models.ForeignKey(Appointment, related_name='+')
+
+    class Meta:
+        app_label = 'example'
+
+
+class RequisitionMetaData(RequisitionMetaDataModelMixin, BaseUuidModel):
+
+    registered_subject = models.ForeignKey(RegisteredSubject)
+
+    appointment = models.ForeignKey(Appointment, related_name='+')
 
     class Meta:
         app_label = 'example'
