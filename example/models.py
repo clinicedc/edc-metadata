@@ -9,9 +9,19 @@ from edc_visit_tracking.models.crf_model_mixin import CrfModelMixin
 from edc_visit_tracking.models.previous_visit_mixin import PreviousVisitMixin
 from edc_visit_tracking.models.visit_model_mixin import VisitModelMixin
 from edc_meta_data.model_mixins import CrfMetaDataModelMixin, RequisitionMetaDataModelMixin
+from edc_consent.models.base_consent import BaseConsent
+from edc_consent.models.fields.bw.identity_fields_mixin import IdentityFieldsMixin
+from edc_consent.models.fields import ReviewFieldsMixin, PersonalFieldsMixin, CitizenFieldsMixin, VulnerabilityFieldsMixin
 
 
-class RegisteredSubject(RegisteredSubjectModelMixin):
+class RegisteredSubject(RegisteredSubjectModelMixin, BaseUuidModel):
+
+    class Meta:
+        app_label = 'example'
+
+
+class SubjectConsent(BaseConsent, IdentityFieldsMixin, ReviewFieldsMixin,
+                     PersonalFieldsMixin, CitizenFieldsMixin, VulnerabilityFieldsMixin, BaseUuidModel):
 
     class Meta:
         app_label = 'example'

@@ -202,13 +202,13 @@ class CrfMetaDataMixin:
         crf_entry = None
         base_appointment = self.get_base_appointment(appointment)
         try:
-            crf_entry = CrfEntry.objects.get(
+            options = dict(
                 app_label=app_label,
                 model_name=model_name,
                 visit_definition=base_appointment.visit_definition)
+            crf_entry = CrfEntry.objects.get(**options)
         except CrfEntry.DoesNotExist:
-            raise ImproperlyConfigured('Crf Entry does not exist. Check AppConfiguration. Got {}.{}.'.format(
-                app_label, model_name))
+            raise ImproperlyConfigured('Missing CrfEntry. Did you define a visit schedule? Using {}'.format(options))
         try:
             crf_meta_data = self.crf_meta_data_model.objects.create(
                 crf_entry=crf_entry,

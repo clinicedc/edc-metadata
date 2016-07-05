@@ -28,7 +28,6 @@ class TestMetaData(TestCase):
         self.appointment = Appointment.objects.create(
             registered_subject=registered_subject,
             appt_datetime=timezone.now(),
-            visit_instance='0',
             visit_definition=self.visit_defininition,
         )
 

@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'edc_appointment.apps.EdcAppointmentAppConfig',
+    'edc_content_type_map.apps.EdcContentTypeAppConfig',
+    'edc_visit_schedule.apps.EdcVisitScheduleAppConfig',
+    'edc_meta_data.apps.EdcMetaDataAppConfig',
     'example.apps.ExampleAppConfig'
 ]
 

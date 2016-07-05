@@ -9,3 +9,4 @@ git+https://github.com/botswana-harvard/edc-constants@develop#egg=edc-constants
 git+https://github.com/botswana-harvard/edc-visit-tracking@develop#egg=edc-visit-tracking
 git+https://github.com/botswana-harvard/edc-rule-groups@develop#egg=edc-rule-groups
 git+https://github.com/botswana-harvard/edc-registration@develop#egg=edc-registration
+git+https://github.com/botswana-harvard/edc-consent@develop#egg=edc_consent
