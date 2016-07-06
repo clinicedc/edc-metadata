@@ -6,8 +6,6 @@ from django.db.utils import IntegrityError
 from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, NO
 from edc_content_type_map.models import ContentTypeMap
 
-from .models import CrfEntry, LabEntry, RequisitionPanel
-
 
 class CrfMetaDataMixin:
 
@@ -79,21 +77,12 @@ class CrfMetaDataMixin:
         * if a form is already KEYED it will not be changed.
         * if visit.require_crfs, then only the off study meta data is changed.
         """
-        app_label = self.off_study_model._meta.app_label
-        model_name = self.off_study_model._meta.model_name
-        content_type_map = ContentTypeMap.objects.get(app_label=app_label, module_name=model_name)
-        with transaction.atomic():
-            try:
-                CrfEntry.objects.create(
-                    content_type_map=content_type_map,
-                    visit_definition=self.appointment.visit_definition,
-                    entry_order=0,
-                    app_label=app_label,
-                    model_name=model_name,
-                    default_entry_status=REQUIRED,
-                    additional=True)
-            except IntegrityError:
-                pass
+        # TODO: get the off study model from the schedule
+        # maybe find the model in a schedule and return the schedule.off_study_model
+
+        app_label = None
+        model_name = None
+
         if self.require_crfs == NO:
             self.change_all_to_not_required()
         self.crf_is_required(
@@ -102,21 +91,13 @@ class CrfMetaDataMixin:
     def require_death_report(self):
         """Changes the meta data so that only the death and
         off study forms are required, unless require_crfs is True."""
-        app_label = self.death_report_model._meta.app_label
-        model_name = self.death_report_model._meta.model_name
-        content_type_map = ContentTypeMap.objects.get(app_label=app_label, module_name=model_name)
-        with transaction.atomic():
-            try:
-                CrfEntry.objects.create(
-                    content_type_map=content_type_map,
-                    visit_definition=self.appointment.visit_definition,
-                    entry_order=0,
-                    app_label=app_label,
-                    model_name=model_name,
-                    default_entry_status=REQUIRED,
-                    additional=True)
-            except IntegrityError:
-                pass
+
+        # TODO: get the death report model from the schedule
+        # maybe find the model in a schedule and return the schedule.death_report_model
+
+        app_label = None
+        model_name = None
+
         self.crf_is_required(
             self.appointment, app_label, model_name, create=True)
 

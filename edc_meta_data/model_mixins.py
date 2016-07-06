@@ -3,7 +3,6 @@ from django.db import models
 from edc_constants.constants import NOT_REQUIRED, UNKEYED
 
 from .choices import ENTRY_STATUS
-from .models import CrfEntry, LabEntry
 
 
 class MetaDataModelMixin(models.Model):
@@ -72,13 +71,17 @@ class CrfMetaDataModelMixin(MetaDataModelMixin):
                 app_label = 'my_app'
     """
 
-    crf_entry = models.ForeignKey(CrfEntry)
+    schedule_name = models.CharField(max_length=25, null=True)
+
+    app_label = models.CharField(max_length=25, null=True)
+
+    model_name = models.CharField(max_length=25, null=True)
 
     def __str__(self):
         return str(self.current_entry_title) or ''
 
-    def natural_key(self):
-        return self.appointment.natural_key() + self.crf_entry.natural_key()
+#     def natural_key(self):
+#         return self.appointment.natural_key() + self.crf_entry.natural_key()
 
     class Meta:
         abstract = True
@@ -102,13 +105,19 @@ class RequisitionMetaDataModelMixin(MetaDataModelMixin):
                 app_label = 'my_app'
     """
 
-    lab_entry = models.ForeignKey(LabEntry)
+    schedule_name = models.CharField(max_length=25, null=True)
+
+    app_label = models.CharField(max_length=25, null=True)
+
+    model_name = models.CharField(max_length=25, null=True)
+
+    panel_name = models.CharField(max_length=50, null=True)
 
     def __str__(self):
-        return '%s: %s' % (self.registered_subject.subject_identifier, self.lab_entry.requisition_panel.name)
+        return '%s: %s' % (self.registered_subject.subject_identifier, self.panel_name)
 
-    def natural_key(self):
-        return self.appointment.natural_key() + self.lab_entry.natural_key()
+#     def natural_key(self):
+#         return self.appointment.natural_key() + self.lab_entry.natural_key()
 
     class Meta:
         abstract = True
