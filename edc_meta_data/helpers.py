@@ -14,7 +14,7 @@ class BaseMetaDataHelper(object):
 
     def __init__(self, appointment, visit_instance=None, visit_model_attrname=None):
         self.appointment = appointment
-        self.visit_model = self.appointment.visit_definition.visit_tracking_content_type_map.model_class()
+        self.visit_model = self.appointment.visit_definition.visit_model
         self.visit_model_attrname = visit_model_attrname or convert_from_camel(self.visit_model._meta.object_name)
         self.visit_instance = visit_instance
 
