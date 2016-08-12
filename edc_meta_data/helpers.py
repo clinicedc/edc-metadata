@@ -62,8 +62,7 @@ class BaseMetaDataHelper(object):
         if not self.appointment.visit_instance == '0':
             Appointment = self.appointment.__class__
             self._appointment_zero = Appointment.objects.get(
-                registered_subject=self.appointment.registered_subject,
-                visit_definition=self.appointment.visit_definition,
+                appointment_identifier=self.appointment.appointment_identifier,
                 visit_instance='0')
         else:
             self._appointment_zero = self.appointment
@@ -113,7 +112,7 @@ class BaseMetaDataHelper(object):
         """Returns a list of meta data instances for the given subject and appointment_zero."""
         if self.appointment_zero:
             options = {
-                'registered_subject_id': self.appointment.registered_subject.pk,
+                'appointment_identifier': self.appointment.appointment_identifier,
                 'appointment_id': self.appointment_zero.pk}
             if entry_status:
                 options.update({'entry_status': entry_status})
