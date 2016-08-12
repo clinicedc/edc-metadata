@@ -1,15 +1,20 @@
-from edc_base.utils import convert_from_camel
-from edc_constants.constants import REQUIRED, YES
-from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
+from django.apps import apps as django_apps
 from django.core.exceptions import FieldError, ValidationError
+
+from edc_base.utils import convert_from_camel
+from edc_constants.constants import YES
+from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
 
 
 class BaseMetaDataHelper(object):
     """ Base class for all classes that manage the entry state
     of additional, scheduled and unscheduled data."""
+
+    entry_attr = None
+
     def __init__(self, appointment, visit_instance=None, visit_model_attrname=None):
         self.appointment = appointment
-        self.visit_model = self.appointment.visit_definition.visit_tracking_content_type_map.model_class()
+        self.visit_model = self.appointment.visit_definition.visit_model
         self.visit_model_attrname = visit_model_attrname or convert_from_camel(self.visit_model._meta.object_name)
         self.visit_instance = visit_instance
 
@@ -18,6 +23,10 @@ class BaseMetaDataHelper(object):
 
     def __str__(self):
         return '({0.instance!r})'.format(self)
+
+    @property
+    def entry_model(self):
+        return django_apps.get_model('edc_meta_data', self.entry_attr.replace('_', ''))
 
     @property
     def visit_model_attrname(self):
@@ -53,8 +62,7 @@ class BaseMetaDataHelper(object):
         if not self.appointment.visit_instance == '0':
             Appointment = self.appointment.__class__
             self._appointment_zero = Appointment.objects.get(
-                registered_subject=self.appointment.registered_subject,
-                visit_definition=self.appointment.visit_definition,
+                appointment_identifier=self.appointment.appointment_identifier,
                 visit_instance='0')
         else:
             self._appointment_zero = self.appointment
@@ -100,24 +108,11 @@ class BaseMetaDataHelper(object):
             if model.entry_meta_data_manager.instance:
                 model.entry_meta_data_manager.run_rule_groups()
 
-    def get_next_entry_for(self, entry_order):
-        """Gets next meta data instance based on the given entry order,
-        used with the save_next button on a form."""
-        instance = None
-        options = {
-            'registered_subject_id': self.appointment.registered_subject.pk,
-            'appointment_id': self.appointment_zero.pk,
-            'entry_status': REQUIRED,
-            '{0}__entry_order__gt'.format(self.entry_attr): entry_order}
-        if self.meta_data_model.objects.filter(**options):
-            instance = self.meta_data_model.objects.filter(**options)[0]
-        return instance
-
     def get_meta_data(self, entry_status=None):
         """Returns a list of meta data instances for the given subject and appointment_zero."""
         if self.appointment_zero:
             options = {
-                'registered_subject_id': self.appointment.registered_subject.pk,
+                'appointment_identifier': self.appointment.appointment_identifier,
                 'appointment_id': self.appointment_zero.pk}
             if entry_status:
                 options.update({'entry_status': entry_status})
@@ -126,3 +121,57 @@ class BaseMetaDataHelper(object):
         else:
             meta_data = []
         return meta_data
+
+
+class CrfMetaDataHelper(BaseMetaDataHelper):
+
+    entry_attr = 'crf_entry'
+
+    @property
+    def meta_data_model(self):
+        return django_apps.get_app_config('edc_meta_data').crf_meta_data_model
+
+
+class RequisitionMetaDataHelper(BaseMetaDataHelper):
+
+    entry_attr = 'lab_entry'
+
+    def __repr__(self):
+        return 'RequisitionMetaDataHelper({0.instance!r})'.format(self)
+
+    def __str__(self):
+        return '({0.instance!r})'.format(self)
+
+    @property
+    def meta_data_model(self):
+        return django_apps.get_app_config('edc_meta_data').requisition_meta_data_model
+
+    def get_meta_data(self, entry_status=None):
+        """Returns a list of meta data instances for the given subject and appointment_zero."""
+        if self.appointment:  # TODO: appointment_zero??
+            options = {'appointment_id': self.appointment.pk}
+            if entry_status:
+                options.update({'entry_status': entry_status})
+            meta_data = self.meta_data_model.objects.filter(**options).order_by(
+                '{0}__entry_order'.format(self.entry_attr))
+        else:
+            meta_data = []
+        return meta_data
+
+    def add_or_update_for_visit(self):
+        """ Loops thru the list of entries configured for the visit_definition
+        and calls the entry_meta_data_manager for each model.
+
+        The visit definition comes instance."""
+        for lab_entry in self.entry_model.objects.filter(visit_definition=self.appointment.visit_definition):
+            model = lab_entry.get_model()
+            model.entry_meta_data_manager.visit_instance = self.visit_instance
+            model.entry_meta_data_manager.target_requisition_panel = lab_entry.requisition_panel
+            try:
+                model.entry_meta_data_manager.instance = model.objects.get(
+                    **model.entry_meta_data_manager.query_options)
+            except model.DoesNotExist:
+                model.entry_meta_data_manager.instance = None
+            model.entry_meta_data_manager.update_meta_data()
+            if model.entry_meta_data_manager.instance:
+                model.entry_meta_data_manager.run_rule_groups()

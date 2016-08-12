@@ -1,20 +1,79 @@
+from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 
-from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, NO
+from edc_constants.constants import REQUIRED, KEYED, NO, NOT_REQUIRED, UNKEYED
 from edc_content_type_map.models import ContentTypeMap
 
-from .crf_entry import CrfEntry
-from .crf_meta_data import CrfMetaData
-from .lab_entry import LabEntry
-from .requisition_meta_data import RequisitionMetaData
-from .requisition_panel import RequisitionPanel
+from .choices import ENTRY_STATUS
+from .models import CrfEntry, LabEntry, RequisitionPanel
 
 
-class CrfMetaDataMixin(models.Model):
+class MetaDataModelMixin(models.Model):
+
+    """ Base model for list of required entries by registered_subject. """
+
+    current_entry_title = models.CharField(
+        max_length=250,
+        null=True)
+
+    entry_status = models.CharField(
+        max_length=25,
+        choices=ENTRY_STATUS,
+        default=UNKEYED,
+        db_index=True)
+
+    due_datetime = models.DateTimeField(
+        null=True,
+        blank=True)
+
+    report_datetime = models.DateTimeField(
+        null=True,
+        blank=True)
+
+    entry_comment = models.TextField(
+        max_length=250,
+        null=True,
+        blank=True)
+
+    close_datetime = models.DateTimeField(
+        null=True,
+        blank=True)
+
+    fill_datetime = models.DateTimeField(
+        null=True,
+        blank=True)
+
+    def is_required(self):
+        return self.entry_status != NOT_REQUIRED
+
+    def is_not_required(self):
+        return not self.is_required()
+
+    def include_for_dispatch(self):
+        return True
+
+    class Meta:
+        abstract = True
+
+
+class CrfMetaDataModelMixin(MetaDataModelMixin):
 
     """Class to manipulate meta data after entry_meta_data_manager for CRFs and requisitions."""
+
+    crf_entry = models.ForeignKey(CrfEntry)
+
+    def natural_key(self):
+        return self.appointment.natural_key() + self.crf_entry.natural_key()
+
+    @property
+    def crf_meta_data_model(self):
+        return django_apps.get_app_config('edc_meta_data').crf_meta_data_model
+
+    @property
+    def requisition_meta_data_model(self):
+        return django_apps.get_app_config('edc_meta_data').requisition_meta_data_model
 
     def custom_post_update_crf_meta_data(self):
         return self
@@ -29,13 +88,13 @@ class CrfMetaDataMixin(models.Model):
         crf_meta_data = None
         if delete:
             try:
-                obj = CrfMetaData.objects.get(
+                obj = self.crf_meta_data_model.objects.get(
                     crf_entry__app_label=app_label,
                     crf_entry__model_name=model_name,
                     appointment=self.get_base_appointment(appointment),
                     entry_status__in=[REQUIRED, NOT_REQUIRED])
                 obj.delete()
-            except CrfMetaData.DoesNotExist:
+            except self.crf_meta_data_model.DoesNotExist:
                 pass
         else:
             crf_meta_data = self.change_crf_status(
@@ -52,7 +111,7 @@ class CrfMetaDataMixin(models.Model):
         self.change_requisition_status(
             NOT_REQUIRED, appointment, app_label, model_name, panel_name)
         if delete:
-            RequisitionMetaData.objects.filter(
+            self.requisition_meta_data_model.objects.filter(
                 lab_entry__app_label=app_label,
                 lab_entry__model_name=model_name,
                 appointment=self.get_base_appointment(appointment),
@@ -134,13 +193,13 @@ class CrfMetaDataMixin(models.Model):
         """Changes all meta data to not required."""
         with transaction.atomic():
             base_appointment = self.get_base_appointment(self.appointment)
-            CrfMetaData.objects.filter(
+            self.crf_meta_data_model.objects.filter(
                 appointment=base_appointment,
                 registered_subject=self.appointment.registered_subject).exclude(
                     entry_status__in=[NOT_REQUIRED, KEYED]).exclude(
                         crf_entry__model_name=self.death_report_model._meta.model_name).update(
                     entry_status=NOT_REQUIRED)
-            RequisitionMetaData.objects.filter(
+            self.requisition_meta_data_model.objects.filter(
                 appointment=base_appointment,
                 registered_subject=self.appointment.registered_subject).exclude(
                     entry_status__in=[NOT_REQUIRED, KEYED]).update(
@@ -152,14 +211,14 @@ class CrfMetaDataMixin(models.Model):
         if entry_status in [REQUIRED, NOT_REQUIRED]:
             with transaction.atomic():
                 try:
-                    crf_meta_data = CrfMetaData.objects.get(
+                    crf_meta_data = self.crf_meta_data_model.objects.get(
                         crf_entry__app_label=app_label,
                         crf_entry__model_name=model_name,
                         appointment=self.get_base_appointment(appointment),
                         entry_status__in=[x for x in [REQUIRED, NOT_REQUIRED] if x != entry_status])
                     crf_meta_data.entry_status = entry_status
                     crf_meta_data.save()
-                except CrfMetaData.DoesNotExist:
+                except self.crf_meta_data_model.DoesNotExist:
                     if create:
                         crf_meta_data = self.create_crf_meta_data(
                             appointment, app_label, model_name, entry_status)
@@ -170,7 +229,7 @@ class CrfMetaDataMixin(models.Model):
         """Toggles a Requisition's entry status between REQUIRED / NOT REQUIRED."""
         if entry_status in [REQUIRED, NOT_REQUIRED]:
             try:
-                requisition_meta_data = RequisitionMetaData.objects.get(
+                requisition_meta_data = self.requisition_meta_data_model.objects.get(
                     lab_entry__app_label=app_label,
                     lab_entry__model_name=model_name,
                     appointment=self.get_base_appointment(appointment),
@@ -178,7 +237,7 @@ class CrfMetaDataMixin(models.Model):
                     entry_status__in=[x for x in [REQUIRED, NOT_REQUIRED] if x != entry_status])
                 requisition_meta_data.entry_status = entry_status
                 requisition_meta_data.save()
-            except RequisitionMetaData.DoesNotExist:
+            except self.requisition_meta_data_model.DoesNotExist:
                 if create:
                     requisition_meta_data = self.create_requisition_meta_data(
                         appointment, app_label, model_name, panel_name,
@@ -197,7 +256,7 @@ class CrfMetaDataMixin(models.Model):
             raise ImproperlyConfigured('Crf Entry does not exist. Check AppConfiguration. Got {}.{}.'.format(
                 app_label, model_name))
         try:
-            crf_meta_data = CrfMetaData.objects.create(
+            crf_meta_data = self.crf_meta_data_model.objects.create(
                 crf_entry=crf_entry,
                 appointment=base_appointment,
                 registered_subject=base_appointment.registered_subject,
@@ -220,7 +279,7 @@ class CrfMetaDataMixin(models.Model):
             raise ImproperlyConfigured('Lab Entry does not exist. Check AppConfiguration. Got {}.{} panel {}.'.format(
                 app_label, model_name, requisition_panel.name))
         try:
-            requisition_meta_data = RequisitionMetaData.objects.create(
+            requisition_meta_data = self.requisition_meta_data_model.objects.create(
                 lab_entry=lab_entry,
                 appointment=base_appointment,
                 lab_entry__requisition_panel=requisition_panel,
@@ -243,3 +302,27 @@ class CrfMetaDataMixin(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name = "Crf Metadata"
+        verbose_name_plural = "Crf Metadata"
+        ordering = ['registered_subject', 'crf_entry', 'appointment']
+        unique_together = ['registered_subject', 'crf_entry', 'appointment']
+
+
+class RequisitionMetaDataModelMixin(MetaDataModelMixin):
+
+    """Subject-specific list of required and scheduled lab as per normal visit schedule."""
+
+    lab_entry = models.ForeignKey(LabEntry)
+
+    def __str__(self):
+        return '{}: {}' % (self.registered_subject.subject_identifier, self.lab_entry.requisition_panel.name)
+
+    def natural_key(self):
+        return self.appointment.natural_key() + self.lab_entry.natural_key()
+
+    class Meta:
+        abstract = True
+        verbose_name = "Requisition Meta Data"
+        verbose_name_plural = "Requisition Meta Data"
+        ordering = ['registered_subject', 'lab_entry__requisition_panel__name', 'appointment', ]
+        unique_together = ['registered_subject', 'lab_entry', 'appointment', ]
