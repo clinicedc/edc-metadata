@@ -1,7 +1,8 @@
 from django.contrib import admin
 
-from edc_base.modeladmin.admin import BaseModelAdmin, BaseTabularInline
+from edc_base.modeladmin.admin import BaseTabularInline
 
+from .base_model_admin import BaseModelAdmin
 from ..models import CrfEntry
 
 

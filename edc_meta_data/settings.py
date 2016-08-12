@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 from unipath import Path
 
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,29 +32,35 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'edc_appointment',
+    'django_crypto_fields',
+    'simple_history',
     'edc_base',
-    'edc_configuration',
-    'edc_consent',
+    'edc_appointment',
     'edc_content_type_map',
-    'edc_crypto_fields',
-    'edc_export',
-    'edc_lab.lab_clinic_api',
-    'edc_meta_data',
     'edc_registration',
-    'edc_sync',
-    'edc_testing',
-    'edc_visit_tracking',
     'edc_visit_schedule',
-    'lab_requisition',
-)
+    'edc_meta_data',
+]
+
+if 'test' in sys.argv:
+    INSTALLED_APPS = INSTALLED_APPS + [
+        'edc_configuration',
+        'edc_consent',
+        'edc_crypto_fields',
+        'edc_export',
+        'edc_lab.lab_clinic_api',
+        'edc_sync',
+        'edc_testing',
+        'edc_visit_tracking',
+        'lab_requisition',
+    ]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -3,7 +3,6 @@ from django.db import models
 from edc_appointment.models import Appointment
 
 from .base_meta_data import BaseMetaData
-
 from .base_meta_data_manager import BaseMetaDataManager
 from .crf_entry import CrfEntry
 
@@ -27,8 +26,8 @@ class CrfMetaData(BaseMetaData):
 
     objects = CrfMetaDataManager()
 
-    def __unicode__(self):
-        return unicode(self.current_entry_title) or u''
+    def __str__(self):
+        return str(self.current_entry_title) or ''
 
     def natural_key(self):
         return self.appointment.natural_key() + self.crf_entry.natural_key()

@@ -15,3 +15,4 @@ class RequisitionMetaDataForm (forms.ModelForm):
 
     class Meta:
         model = RequisitionMetaData
+        fields = '__all__'

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import get_model
+from django.apps import apps as django_apps
 
 from edc_base.model.models import BaseUuidModel
 from edc_constants.constants import NOT_REQUIRED, REQUIRED
@@ -70,7 +70,7 @@ class CrfEntry(BaseUuidModel):
             self.app_label = self.content_type_map.app_label
         if not self.model_name:
             self.model_name = self.content_type_map.model
-        model = get_model(self.app_label, self.model_name)
+        model = django_apps.get_model(self.app_label, self.model_name)
         try:
             model.entry_meta_data_manager
         except AttributeError:
@@ -84,12 +84,12 @@ class CrfEntry(BaseUuidModel):
         return self.visit_definition.natural_key() + self.content_type_map.natural_key()
 
     def get_model(self):
-        return get_model(self.app_label, self.model_name)
+        return django_apps.get_model(self.app_label, self.model_name)
 
     def form_title(self):
         self.content_type_map.content_type.model_class()._meta.verbose_name
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0}: {1}'.format(self.visit_definition.code, self.content_type_map.content_type)
 
     @property

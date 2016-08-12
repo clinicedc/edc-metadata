@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
+from edc_constants.constants import DEAD, OFF_STUDY
 from edc_rule_groups.classes import site_rule_groups
 from edc_registration.models import RegisteredSubject
 from edc_visit_tracking.models import VisitModelMixin
@@ -9,7 +10,6 @@ from .crf_meta_data import CrfMetaData
 from .crf_meta_data_helper import CrfMetaDataHelper
 from .requisition_meta_data import RequisitionMetaData
 from .requisition_meta_data_helper import RequisitionMetaDataHelper
-from edc_constants.constants import DEAD, OFF_STUDY
 
 
 @receiver(post_save, weak=False, dispatch_uid="meta_data_on_post_save")

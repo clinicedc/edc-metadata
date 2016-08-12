@@ -1,6 +1,6 @@
-from ..models import CrfMetaData, CrfEntry
-
 from .base_meta_data_helper import BaseMetaDataHelper
+from .crf_entry import CrfEntry
+from .crf_meta_data import CrfMetaData
 
 
 class CrfMetaDataHelper(BaseMetaDataHelper):
