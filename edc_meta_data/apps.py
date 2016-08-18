@@ -1,9 +1,9 @@
-from django.apps.config import AppConfig
+from django.apps.config import AppConfig as DjangoAppConfig
 from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
 
 
-class EdcMetaDataAppConfig(AppConfig):
+class AppConfig(DjangoAppConfig):
     name = 'edc_meta_data'
     model_attrs = None  # list of [(app_label, crfmetadata), (app_label, requisitionmetadata)]
     crf_meta_data_model_name = 'crfmetadata'
