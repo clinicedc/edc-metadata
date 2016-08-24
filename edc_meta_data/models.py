@@ -2,12 +2,25 @@ from django.apps import apps as django_apps
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
-from edc_constants.constants import DEAD, OFF_STUDY
-from edc_meta_data.helpers import CrfMetaDataHelper, RequisitionMetaDataHelper
-from edc_rule_groups.classes import site_rule_groups
+#from edc_constants.constants import DEAD, OFF_STUDY
+#from edc_meta_data.helpers import CrfMetaDataHelper, RequisitionMetaDataHelper
+#from edc_rule_groups.classes import site_rule_groups
 from edc_visit_tracking.models import VisitModelMixin
+from edc_meta_data.model_mixins import CrfMetaDataModelMixin, RequisitionMetaDataModelMixin
+from edc_base.model.models import BaseUuidModel
+#from edc_visit_schedule.site_visit_schedules import site_visit_schedules
 
-from edc_visit_schedule.site_visit_schedules import site_visit_schedules
+
+class CrfMetaData(CrfMetaDataModelMixin, BaseUuidModel):
+
+    class Meta:
+        app_label = 'edc_meta_data'
+
+
+class RequisitionMetaData(RequisitionMetaDataModelMixin, BaseUuidModel):
+
+    class Meta:
+        app_label = 'edc_meta_data'
 
 
 @receiver(post_save, weak=False, dispatch_uid="meta_data_on_post_save")

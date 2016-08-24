@@ -40,19 +40,26 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'simple_history',
-    'django_crypto_fields.apps.DjangoCryptoFieldsAppConfig',
-    'edc_base',
-    'edc_appointment.apps.EdcAppointmentAppConfig',
-    'edc_content_type_map.apps.EdcContentTypeAppConfig',
-    'edc_visit_schedule.apps.EdcVisitScheduleAppConfig',
-    'edc_meta_data.apps.EdcMetaDataAppConfig',
-    'example.apps.EdcConsentAppConfig',
-    'example.apps.ExampleAppConfig'
+    'django_crypto_fields.apps.AppConfig',
+    'django_revision.apps.AppConfig',
+    'edc_base.apps.AppConfig',
+    'edc_appointment.apps.AppConfig',
+    'edc_registration.apps.AppConfig',
+    'edc_protocol.apps.AppConfig',
+    'edc_content_type_map.apps.AppConfig',
+    'edc_visit_schedule.apps.AppConfig',
+    'edc_visit_tracking.apps.AppConfig',
+    'edc_meta_data.apps.AppConfig',
+    'example.apps.AppConfig',
 ]
 
-# if 'test' in sys.argv:
-#     MIGRATION_MODULES = {"example": None,
-#                          "edc_meta_data": None}
+if 'test' in sys.argv:
+    MIGRATION_MODULES = {"example": None,
+                         "edc_meta_data": None,
+                         'edc_visit_tracking': None,
+                         'edc_content_type_map': None,
+                         'django_crypto_fields': None,
+                         'edc_appointment': None}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

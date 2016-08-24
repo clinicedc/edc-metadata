@@ -3,7 +3,8 @@ from django.core.exceptions import FieldError, ValidationError
 
 from edc_base.utils import convert_from_camel
 from edc_constants.constants import YES
-from edc_visit_tracking.constants import VISIT_REASON_NO_FOLLOW_UP_CHOICES
+
+edc_visit_tracking_app_config = django_apps.get_app_config('edc_visit_tracking')
 
 
 class BaseMetaDataHelper(object):
@@ -78,7 +79,7 @@ class BaseMetaDataHelper(object):
         except AttributeError as e:
             if 'get_visit_reason_no_follow_up_choices' not in str(e):
                 raise AttributeError(str(e))
-            no_follow_up_reasons = VISIT_REASON_NO_FOLLOW_UP_CHOICES
+            no_follow_up_reasons = edc_visit_tracking_app_config.no_followup_reasons
         show_entries = self.visit_instance.reason not in no_follow_up_reasons
         if self.visit_instance.reason in self.visit_instance.get_off_study_reason():
             try:

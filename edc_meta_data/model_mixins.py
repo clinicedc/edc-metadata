@@ -1,9 +1,9 @@
 from django.db import models
 
-from edc_constants.constants import NOT_REQUIRED, UNKEYED
 from edc_registration.mixins import RegisteredSubjectMixin
 
 from .choices import ENTRY_STATUS
+from .constants import NOT_REQUIRED, UNKEYED
 
 
 class MetaDataModelMixin(RegisteredSubjectMixin, models.Model):

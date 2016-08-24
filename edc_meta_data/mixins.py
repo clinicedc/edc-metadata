@@ -3,8 +3,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 from django.db.utils import IntegrityError
 
-from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, NO
-from edc_content_type_map.models import ContentTypeMap
+from edc_constants.constants import NO
+
+from .constants import REQUIRED, NOT_REQUIRED, KEYED
 
 
 class CrfMetaDataMixin:

@@ -3,7 +3,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
 from edc_base.utils import convert_from_camel
-from edc_constants.constants import REQUIRED, NOT_REQUIRED, KEYED, MISSED_VISIT, LOST_VISIT
+from edc_visit_tracking.constants import MISSED_VISIT, LOST_VISIT
+
+from .constants import REQUIRED, NOT_REQUIRED, KEYED
 
 
 class BaseMetaDataManager(models.Manager):

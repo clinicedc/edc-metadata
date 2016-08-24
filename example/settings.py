@@ -37,11 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'edc_appointment.apps.EdcAppointmentAppConfig',
-    'edc_content_type_map.apps.EdcContentTypeAppConfig',
-    'edc_visit_schedule.apps.EdcVisitScheduleAppConfig',
-    'edc_meta_data.apps.EdcMetaDataAppConfig',
-    'example.apps.ExampleAppConfig'
+    'django_crypto_fields.apps.AppConfig',
+    'edc_appointment.apps.AppConfig',
+    'edc_registration.apps.AppConfig',
+    'edc_protocol.apps.AppConfig',
+    'edc_content_type_map.apps.AppConfig',
+    'edc_visit_schedule.apps.AppConfig',
+    'edc_visit_tracking.apps.AppConfig',
+    'edc_meta_data.apps.AppConfig',
+    'example.apps.AppConfig'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -55,7 +59,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'x.urls'
+ROOT_URLCONF = 'example.urls'
 
 TEMPLATES = [
     {
@@ -73,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'x.wsgi.application'
+WSGI_APPLICATION = 'example.wsgi.application'
 
 
 # Database
