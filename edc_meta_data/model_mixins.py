@@ -1,16 +1,25 @@
 from django.db import models
 
 from edc_constants.constants import NOT_REQUIRED, UNKEYED
+from edc_registration.mixins import RegisteredSubjectMixin
 
 from .choices import ENTRY_STATUS
 
 
-class MetaDataModelMixin(models.Model):
+class MetaDataModelMixin(RegisteredSubjectMixin, models.Model):
 
     """ Mixin for CrfMetaData and RequisitionMetaData models to be created in the local app.
 
     Use the specific model mixins below.
     """
+
+    schedule_name = models.CharField(max_length=25, null=True)
+
+    app_label = models.CharField(max_length=25, null=True)
+
+    model_name = models.CharField(max_length=25, null=True)
+
+    visit_code = models.CharField(max_length=25, null=True)
 
     current_entry_title = models.CharField(
         max_length=250,
@@ -43,6 +52,9 @@ class MetaDataModelMixin(models.Model):
         null=True,
         blank=True)
 
+    def natural_key(self):
+        return (self.subject_identifier, self.visit_code) + self.crf_entry.natural_key()
+
     def is_required(self):
         return self.entry_status != NOT_REQUIRED
 
@@ -54,6 +66,7 @@ class MetaDataModelMixin(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ['subject_identifier', 'visit_code', 'appointment']
 
 
 class CrfMetaDataModelMixin(MetaDataModelMixin):
@@ -71,17 +84,8 @@ class CrfMetaDataModelMixin(MetaDataModelMixin):
                 app_label = 'my_app'
     """
 
-    schedule_name = models.CharField(max_length=25, null=True)
-
-    app_label = models.CharField(max_length=25, null=True)
-
-    model_name = models.CharField(max_length=25, null=True)
-
     def __str__(self):
         return str(self.current_entry_title) or ''
-
-#     def natural_key(self):
-#         return self.appointment.natural_key() + self.crf_entry.natural_key()
 
     class Meta:
         abstract = True
