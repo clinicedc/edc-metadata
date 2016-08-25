@@ -1,6 +1,6 @@
 from django.db import models
 
-from edc_registration.mixins import RegisteredSubjectMixin
+from edc_registration.model_mixins import RegisteredSubjectMixin
 
 from .choices import ENTRY_STATUS
 from .constants import NOT_REQUIRED, UNKEYED
