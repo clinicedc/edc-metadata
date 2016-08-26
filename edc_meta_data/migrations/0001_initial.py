@@ -8,7 +8,7 @@ import django_revision.revision_field
 import edc_base.model.fields.hostname_modification_field
 import edc_base.model.fields.userfield
 import edc_base.model.fields.uuid_auto_field
-import edc_registration.mixins
+import edc_registration.model_mixins
 
 
 class Migration(migrations.Migration):
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('close_datetime', models.DateTimeField(blank=True, null=True)),
                 ('fill_datetime', models.DateTimeField(blank=True, null=True)),
             ],
-            bases=(edc_registration.mixins.RegisteredSubjectMixin, models.Model),
+            bases=(edc_registration.model_mixins.RegisteredSubjectMixin, models.Model),
         ),
         migrations.CreateModel(
             name='RequisitionMetaData',
@@ -68,6 +68,6 @@ class Migration(migrations.Migration):
                 ('model_name', models.CharField(max_length=25, null=True)),
                 ('panel_name', models.CharField(max_length=50, null=True)),
             ],
-            bases=(edc_registration.mixins.RegisteredSubjectMixin, models.Model),
+            bases=(edc_registration.model_mixins.RegisteredSubjectMixin, models.Model),
         ),
     ]

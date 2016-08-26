@@ -3,7 +3,8 @@ from django.contrib.admin.sites import AdminSite
 from django.core.urlresolvers import reverse
 
 from edc_rule_groups.classes import site_rule_groups
-from edc_constants.constants import REQUIRED
+
+from .constants import REQUIRED
 
 # from .models import CrfEntry, LabEntry, RequisitionPanel
 

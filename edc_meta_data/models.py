@@ -5,7 +5,7 @@ from django.dispatch import receiver
 #from edc_constants.constants import DEAD, OFF_STUDY
 #from edc_meta_data.helpers import CrfMetaDataHelper, RequisitionMetaDataHelper
 #from edc_rule_groups.classes import site_rule_groups
-from edc_visit_tracking.models import VisitModelMixin
+from edc_visit_tracking.model_mixins import VisitModelMixin
 from edc_meta_data.model_mixins import CrfMetaDataModelMixin, RequisitionMetaDataModelMixin
 from edc_base.model.models import BaseUuidModel
 #from edc_visit_schedule.site_visit_schedules import site_visit_schedules
