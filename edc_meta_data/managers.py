@@ -119,10 +119,6 @@ class BaseMetaDataManager(models.Manager):
           * UNKEYED or NOT_REQUIRED it's being called by a rule triggered by another model's post-save
 
         Called by the signal on post_save and pre_delete"""
-        new_status = None
-        if not self.meta_data_instance:
-            # entry status will be the default_entry_status in visit schedule, may return None (see create)
-            self.create_meta_data()
         if self.meta_data_instance:
             if self.instance or change_type in ['I', 'U', 'D'] or self.meta_data_instance.entry_status == KEYED:
                 new_status = KEYED  # (Insert, Update or no change (D or already KEYED)
