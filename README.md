@@ -1,4 +1,4 @@
-# edc_meta_data
+# edc_metadata
 
 `edc-meta-data` puts a meta data layer between your user and scheduled data collection models. The meta data can be used to display links to the data collection models on a dashboard (`edc_dashboard`) and be manipulated in ways that control how the meta data is displayed (`edc_rule_groups`). A data manager uses the meta data to correctly determine data completeness for a timepoint.
 
@@ -37,7 +37,7 @@ The two models have to be declared in your application since they need keys to y
 
 The `AppConfig` then needs to know where these two models reside. In your `apps.py` do the following:
 
-    from edc_meta_data.apps import EdcMetaDataAppConfig as EdcMetaDataAppConfigParent
+    from edc_metadata.apps import EdcMetaDataAppConfig as EdcMetaDataAppConfigParent
 
     class EdcMetaDataAppConfig(EdcMetaDataAppConfigParent):
         model_attrs = [('my_app', 'crfmetadata'), ('my_app', 'requisitionmetadata')]
@@ -91,4 +91,4 @@ See also edc-rule-groups.
 CRF and Requisition meta data are created by the `meta_data_on_post_save` post-save signal for any model that uses the `VisitModelMixin` mixin.
 
 ### How meta-data is updated
-The same post-save signal updates existing meta data for other models that use either the `CrfMetaDataManager` or the `RequisitionMetaDatManager` from `edc_meta_data.manager`.
+The same post-save signal updates existing meta data for other models that use either the `CrfMetaDataManager` or the `RequisitionMetaDatManager` from `edc_metadata.manager`.
