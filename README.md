@@ -68,7 +68,7 @@ Your Crf models must be declared with the `entry_meta_data_manager` and the `Crf
     
 Your requisition models are declared with the `entry_meta_data_manager` and the `RequisitionModelMixin`:
 
-    class RequisitionOne(RequisitionModelMixin, BaseUuidModel):
+    class SubjectRequisition(RequisitionModelMixin, BaseUuidModel):
     
         subject_visit = models.ForeignKey(SubjectVisit)
     
