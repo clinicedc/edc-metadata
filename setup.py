@@ -10,13 +10,13 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='edc-meta-data',
+    name='edc-metadata',
     version='0.2dev',
     author=u'Erik van Widenfelt',
     author_email='ew2789@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    url='http://github/botswana-harvard/edc-meta-data',
+    url='http://github/botswana-harvard/edc-metadata',
     license='GPL licence, see LICENCE',
     description='Add a metadata layer to data entry.',
     long_description=README,
