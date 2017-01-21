@@ -53,7 +53,7 @@ Your requisition models are declared with the `RequisitionModelMixin`:
             app_label = 'example'
 
 ## Introduction
-------------
+
 Data collection follows a schedule where some collection tools or case report forms (CRFs) are required and others not. This module exposes a meta-data layer that can be used to manage and present CRFs scheduled for a visit or time point. 
 
 See also edc-rule-groups.
@@ -74,6 +74,8 @@ The EDC uses `edc_dashboard` to display a list of forms to be completed by the u
 By default a user is required to complete all forms for a visit. That is, the metadata `entry_status` field is set to REQUIRED. The default `entry_status` can be globally changed in the `visit_schedule` or changed in realtime using `edc_metadata.rules`.
 
 `edc_metadata.rules` offers classes with which you can build simple logic rules to change the metadata default `entry_status` value in realtime based on any persisted data in the database. You can operate on the current metadata instance or any in the subjects schedule.   
+
+### edc_metadata.rules
 
 #### autodiscover
 
