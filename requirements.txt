@@ -1,13 +1,10 @@
-Django
 git+https://github.com/erikvw/django-crypto-fields@develop#egg=django_crypto_fields
 git+https://github.com/erikvw/django-revision@develop#egg=django-revision
 git+https://github.com/botswana-harvard/edc-base@develop#egg=edc_base
 git+https://github.com/botswana-harvard/edc-visit-schedule@develop#egg=edc-visit-schedule
-git+https://github.com/botswana-harvard/edc-appointment@develop#egg=edc-appointment
 git+https://github.com/botswana-harvard/edc-constants@develop#egg=edc-constants
 git+https://github.com/botswana-harvard/edc-visit-tracking@develop#egg=edc-visit-tracking
 git+https://github.com/botswana-harvard/edc-registration@develop#egg=edc-registration
-git+https://github.com/botswana-harvard/edc-consent@develop#egg=edc_consent
-git+https://github.com/botswana-harvard/edc-timepoint@develop#egg=edc_timepoint
 git+https://github.com/botswana-harvard/edc-protocol@develop#egg=edc_protocol
 git+https://github.com/botswana-harvard/edc-device@develop#egg=edc_device
+git+https://github.com/botswana-harvard/edc-sync@develop#egg=edc_sync
