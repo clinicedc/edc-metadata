@@ -1,6 +1,6 @@
 # edc_metadata
 
-[![Build Status](https://travis-ci.org/botswana-harvard/edc-metadata.svg?branch=develop)](https://travis-ci.org/botswana-harvard/edc-metadata)
+[![Build Status](https://travis-ci.org/botswana-harvard/edc-metadata.svg?branch=develop)](https://travis-ci.org/botswana-harvard/edc-metadata) [![Coverage Status](https://coveralls.io/repos/github/botswana-harvard/edc-metadata/badge.svg?branch=develop)](https://coveralls.io/github/botswana-harvard/edc-metadata?branch=develop)
 
 `edc-meta-data` puts a meta data layer on top of your data collection models. The meta data can be used to display links to the data collection models on a dashboard (`edc_dashboard`) and be manipulated in ways that control how the meta data is displayed (`edc_metadata.rules`). A data manager can access metadata directly to quickly determine the completion status of required.
 
