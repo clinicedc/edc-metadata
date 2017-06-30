@@ -122,10 +122,9 @@ Let's start with an example from the perspective of the person entering subject 
 A `Rule` that changes the metadata if the subject is male would look like this:
 
     crfs_male = CrfRule(
-        logic=Logic(
-            predicate=P('gender', 'eq', 'MALE'),
-            consequence=REQUIRED,
-            alternative=NOT_REQUIRED),
+        predicate=P('gender', 'eq', 'MALE'),
+        consequence=REQUIRED,
+        alternative=NOT_REQUIRED,
         target_models=['crfone', 'crftwo'])
 
 The rule above has a logic attribute that evaluates like an if/else statement. If 'gender' is equal to 'MALE' then set the metadata `entry_status` for `crf_one` and `crf_two` to REQUIRED, if not, set both to NOT_REQUIRED.
@@ -148,17 +147,15 @@ Rules are declared as attributes of a RuleGroup much like fields in a `django` m
     class ExampleRuleGroup(RuleGroup):
     
         crfs_male = CrfRule(
-            logic=Logic(
-                predicate=P('gender', 'eq', 'MALE'),
-                consequence=REQUIRED,
-                alternative=NOT_REQUIRED),
+            predicate=P('gender', 'eq', 'MALE'),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
             target_models=['crfone', 'crftwo'])
     
         crfs_female = CrfRule(
-            logic=Logic(
-                predicate=P('gender', 'eq', FEMALE),
-                consequence=REQUIRED,
-                alternative=NOT_REQUIRED),
+            predicate=P('gender', 'eq', FEMALE),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
             target_models=['crfthree', 'crffour'])
     
         class Meta:
@@ -204,17 +201,15 @@ The field for car/bicycle, `favorite_transport` is on model `CrfTransport`. The 
     class ExampleRuleGroup(RuleGroup):
     
         bicycle = CrfRule(
-            logic=Logic(
-                predicate=P('favorite_transport', 'eq', 'bicycle'),
-                consequence=REQUIRED,
-                alternative=NOT_REQUIRED),
+            predicate=P('favorite_transport', 'eq', 'bicycle'),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
             target_models=['crfone', 'crftwo'])
     
         car = CrfRule(
-            logic=Logic(
-                predicate=P('favorite_transport', 'eq', car),
-                consequence=REQUIRED,
-                alternative=NOT_REQUIRED),
+            predicate=P('favorite_transport', 'eq', car),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
             target_models=['crfthree', 'crffour'])
     
         class Meta:
