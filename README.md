@@ -2,25 +2,26 @@
 
 [![Build Status](https://travis-ci.org/botswana-harvard/edc-metadata.svg?branch=develop)](https://travis-ci.org/botswana-harvard/edc-metadata) [![Coverage Status](https://coveralls.io/repos/github/botswana-harvard/edc-metadata/badge.svg?branch=develop)](https://coveralls.io/github/botswana-harvard/edc-metadata?branch=develop)
 
-`edc-meta-data` puts a meta data layer on top of your data collection models. The meta data can be used to display links to the data collection models on a dashboard (`edc_dashboard`) and be manipulated in ways that control how the meta data is displayed (`edc_metadata.rules`). A data manager can access metadata directly to quickly determine the completion status of required.
+`edc-meta-data` puts a "metadata" layer on top of your data collection forms, namely CRFs and Requisitions. The "metadata" can be used on a data entry dashboard as is done by `edc_dashboard` or by a data manager to review the completion status of required forms.
 
-## Installation and Configuration
+"metadata rules" are designed and run on each refresh to update the metadata. If your form is not affected by any rules it's metadata "entry_status" will change from REQUIRED to KEYED upon `save`. If a value on some other form implies that your form should not be completed, your form's metadata "entry_status" will change from REQUIRED to NOT REQUIRED upon `save` of the other form.
 
-### To install:
+In the `visit schedule` you can set the initial entry status of each form, be it REQUIRED or NOT REQUIRED.
 
-    pip install git+https://github.com/botswana-harvard/edc-meta-data@develop#egg=edc-meta-data
+Metadata is stored in two models, `CrfMetaData` and `RequisitionMetaData`. One metadata record is created per form per visit. Metadata for a visit is only created for the forms specified for that visit.  
 
-    Note: `edc-meta-data` works together with `edc-visit-schedule`.
-   
-add to INSTALLED_APPS
+Metadata is `created` and metadata rules initially run upon saving the visit form in a `post_save` signal. 
 
-    'edc_metadata.apps.AppConfig',
+Metadata is guaranteed to exist for every form in every visit where the visit form has been completed.
 
-### To configure:
+Metadata is `updated` after each `CRF` or `Requisition` is saved through a `post_save` signal that re-runs the metadata rules.
 
-Meta data is collected in two models, `CrfMetaData` and `RequisitionMetaData`. 
 
-Your application collects data on a schedule. Before declaring the `visit_schedule` let's prepare the models that will be used in the scheduled data collection. These models are your visit models, crf models and requisition models.
+### Getting started:
+
+#### Models: Visit, Crfs and Requisitions
+
+Let's prepare the models that will be used in the scheduled data collection. These models are your visit models, crf models and requisition models.
 
 Your application also has one or more `Visit` models. Each visit model is declared with the `CreatesMetadataModelMixin`:
 
@@ -32,7 +33,7 @@ Your application also has one or more `Visit` models. Each visit model is declar
         class Meta(RequiresConsentMixin.Meta):
             app_label = 'example'
 
-Your Crf models are declared with the `CrfModelMixin`:
+Your `Crf` models are declared with the `CrfModelMixin`:
 
     class CrfOne(CrfModelMixin, BaseUuidModel):
     
@@ -43,7 +44,7 @@ Your Crf models are declared with the `CrfModelMixin`:
         class Meta:
             app_label = 'example'
     
-Your requisition models are declared with the `RequisitionModelMixin`:
+Your `Requisition` models are declared with the `RequisitionModelMixin`:
 
     class SubjectRequisition(RequisitionModelMixin, BaseUuidModel):
     
@@ -54,30 +55,9 @@ Your requisition models are declared with the `RequisitionModelMixin`:
         class Meta:
             app_label = 'example'
 
-## Introduction
+#### `metadata_rules`
 
-Data collection follows a schedule where some collection tools or case report forms (CRFs) are required and others not. This module exposes a meta-data layer that can be used to manage and present CRFs scheduled for a visit or time point. 
-
-See also edc-rule-groups.
-
-### How metadata is created
-CRF and Requisition meta data are created by the `meta_data_on_post_save` post-save signal for any model that uses the `VisitModelMixin` mixin.
-
-### How metadata is updated
-The same post-save signal updates existing meta data for other models that use either the `CrfMetaDataManager` or the `RequisitionMetaDatManager` from `edc_metadata.manager`.
-
-
-### How metadata is manipulated in realtime
-
-`edc_metadata.rules` provides classes that are used to write "rules" that manipulate the "entry status" of `crf` and `requisition` metadata. Rule are registered to `site_metadata_rules` in `metadata_rules.py`. Place this file in the root of your app. Each app can have one `metadata_rules.py`.
-
-The EDC uses `edc_dashboard` to display a list of forms to be completed by the user per visit. The "list of forms" and the entry/save state of each form is persisted as metadata records generated by `edc_metadata`. Each model/form is represented by one metadata record for each visit. Read more in `edc_metadata`.
-
-By default a user is required to complete all forms for a visit. That is, the metadata `entry_status` field is set to REQUIRED. The default `entry_status` can be globally changed in the `visit_schedule` or changed in realtime using `edc_metadata.rules`.
-
-`edc_metadata.rules` offers classes with which you can build simple logic rules to change the metadata default `entry_status` value in realtime based on any persisted data in the database. You can operate on the current metadata instance or any in the subjects schedule.   
-
-### `edc_metadata.rules`
+`metadata_rules` manipulate the `entry_status` of `crf` and `requisition` metadata. Rule are registered to `site_metadata_rules` in `metadata_rules.py`. Place this file in the root of your app. Each app can have one `metadata_rules.py`.
 
 #### autodiscover
 
@@ -99,11 +79,9 @@ Inspect rule groups from the site registry:
     (<edc_example.rule_groups.ExampleRuleGroup: crfs_male>, <edc_example.rule_groups.ExampleRuleGroup: crfs_female>)
     (<edc_example.rule_groups.ExampleRuleGroup2: bicycle>, <edc_example.rule_groups.ExampleRuleGroup2: car>)    
     
-#### Usage
+#### Writing RuleGroups
 
-For a model that uses the `edc_metadata` mixin, each instance, be it the instance "to be" or the existing instance, has a corresponding metadata record. `edc_metadata.rules` act on those metadata records changing the `entry_status` to either "required" or "not required".
-
-In `edc_metadata.rules` you declare a set of `Rules` contained in a `RuleGroup`. Each app has one 'rule_groups.py' that may have as many `RuleGroup` declarations as needed.
+`Rules` are declared in a `RuleGroup`. The syntax is similar to the `django` model class. 
 
 Let's start with an example from the perspective of the person entering subject data. On a dashboard there are 4 forms (models) to be completed. The "rule" is that if the subject is male, only the first two forms should be completed. If the subject is female, only the last two forms should be completed. So the metadata should show:
 
@@ -127,24 +105,12 @@ A `Rule` that changes the metadata if the subject is male would look like this:
         alternative=NOT_REQUIRED,
         target_models=['crfone', 'crftwo'])
 
-The rule above has a logic attribute that evaluates like an if/else statement. If 'gender' is equal to 'MALE' then set the metadata `entry_status` for `crf_one` and `crf_two` to REQUIRED, if not, set both to NOT_REQUIRED.
-
-##### Rule Logic
-
-The `Logic` class has a rule `predicate` that when evaluated is passed a few model instances each of which is checked for the `gender` attribute. If found, the predicate is evaluated to True or False.
-
-The data that is made available for the rule `predicate` by default is:
-* current visit model instance
-* registered subject (see `edc_registration`)
-
-For the rule above, `gender` would be automatically provided to the rule predicate during evaluation from registered subject.
-
-##### Rule Groups
+The rule above has a `predicate` that evaluates to True or not. If `gender` is equal to `MALE` the consequence is `REQUIRED`, else `NOT_REQUIRED`. For this rule, for a MALE, the metadata `entry_status` for `crf_one` and `crf_two` will be updated to `REQUIRED`. For a FEMALE both will be set to `NOT_REQUIRED`.
 
 Rules are declared as attributes of a RuleGroup much like fields in a `django` model:
 
     @register()
-    class ExampleRuleGroup(RuleGroup):
+    class ExampleRuleGroup(CrfRuleGroup):
     
         crfs_male = CrfRule(
             predicate=P('gender', 'eq', 'MALE'),
@@ -161,13 +127,11 @@ Rules are declared as attributes of a RuleGroup much like fields in a `django` m
         class Meta:
             app_label = 'edc_example'
 
-Rule group class declarations are placed in file `rule_groups.py` in the root of your application. They are registered in the order in which they appear in the file. All rule groups are available from the `site_metadata_rules` global.
+Rule group class declarations are placed in file `metadata_rules.py` in the root of your application. They are registered in the order in which they appear in the file. All rule groups are available from the `site_metadata_rules` global.
 
-#### More on Rule Logic and Rule Predicates
+#### More on Rules
 
-##### Logic
-
-The `consequence` and `alternative` except these values:
+The rule `consequence` and `alternative` except these values:
     
     from edc_metadata.constants import REQUIRED, NOT_REQUIRED
     from edc_metadata.rules.constants import DO_NOTHING
@@ -176,16 +140,13 @@ The `consequence` and `alternative` except these values:
     * NOT_REQUIRED
     * DO_NOTHING 
 
-It is recommended to write the logic so that if the `predicate` evaluated to  `True`, the `consequence` is REQUIRED.
-
-##### Rule Predicate values
+It is recommended to write the logic so that the `consequence` is REQUIRED if the `predicate` evaluates to  `True`.
 
 In the examples above, the rule `predicate` can only access values that can be found on the subjects's current `visit` instance or `registered_subject` instance. If the value you need for the rule `predicate` is not on either of those instances, you can pass a `source_model`. With the `source_model` declared you would have these data available:
 
 * current visit model instance
 * registered subject (see `edc_registration`)
 * source model instance for the current visit
-* queryset of source model for the current subject_identifier (more on this one later)
 
 Let's say the rules changes and instead of refering to `gender` (male/female) you wish to refer to the value field of `favorite_transport` on model `CrfTransport`. `favorite_transport` can be "car" or "bicycle". You want the first rule `predicate` to read as:
 
@@ -226,7 +187,9 @@ Note that `CrfTransport` is a `crf` model in the Edc. That is, it has a `foreign
     visit_attr = 'subject_visit'
     source_qs = CrfTansport.objects.filter(**{'{}__subject_identifier'.format(visit_attr): subject_identifier}) 
     
-'''Important''': If the source model instance does not exist, the rules in the rule group will not run
+If the source model instance does not exist, the rules in the rule group will not run. 
+
+If the target model instance exists, no rule can change it's metadata from KEYED. 
 
 ##### More Complex Rule Predicates
 
