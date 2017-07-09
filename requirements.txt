@@ -12,3 +12,4 @@ git+https://github.com/botswana-harvard/edc-appointment@develop#egg=edc-appointm
 git+https://github.com/botswana-harvard/edc-offstudy@develop#egg=edc-offstudy
 git+https://github.com/botswana-harvard/edc-timepoint@develop#egg=edc-timepoint
 git+https://github.com/botswana-harvard/edc-identifier@develop#egg=edc-identifier
+git+https://github.com/botswana-harvard/edc-reference@develop#egg=edc-reference
