@@ -2,19 +2,52 @@
 
 [![Build Status](https://travis-ci.org/botswana-harvard/edc-metadata.svg?branch=develop)](https://travis-ci.org/botswana-harvard/edc-metadata) [![Coverage Status](https://coveralls.io/repos/github/botswana-harvard/edc-metadata/badge.svg?branch=develop)](https://coveralls.io/github/botswana-harvard/edc-metadata?branch=develop)
 
-`edc-meta-data` puts a "metadata" layer on top of your data collection forms, namely CRFs and Requisitions. The "metadata" can be used on a data entry dashboard as is done by `edc_dashboard` or by a data manager to review the completion status of required forms.
+`edc-metadata` puts a "metadata" layer on top of your data collection forms, namely CRFs and Requisitions. The "metadata" can be used on a data entry dashboard as is done by `edc_dashboard` or by a data manager to review the completion status of required forms.
 
-"metadata rules" are designed and run on each refresh to update the metadata. If your form is not affected by any rules it's metadata "entry_status" will change from REQUIRED to KEYED upon `save`. If a value on some other form implies that your form should not be completed, your form's metadata "entry_status" will change from REQUIRED to NOT REQUIRED upon `save` of the other form.
+Metadata is stored in two models, `CrfMetaData` and `RequisitionMetaData`. One metadata record is created per form per visit. Metadata for a visit is only created for the forms specified for that visit in the visit schedule.  
 
-In the `visit schedule` you can set the initial entry status of each form, be it REQUIRED or NOT REQUIRED.
-
-Metadata is stored in two models, `CrfMetaData` and `RequisitionMetaData`. One metadata record is created per form per visit. Metadata for a visit is only created for the forms specified for that visit.  
-
-Metadata is `created` and metadata rules initially run upon saving the visit form in a `post_save` signal. 
+Metadata is created for each visit when the `visit` model is saved. `edc_metadata` reads from the `visit_schedule` to decide what CRF and REQUISITION metadata to create for a visit. (Note: See `edc_visit_schedule`)  
 
 Metadata is guaranteed to exist for every form in every visit where the visit form has been completed.
 
-Metadata is `updated` after each `CRF` or `Requisition` is saved through a `post_save` signal that re-runs the metadata rules.
+
+## `metadata` model instances
+
+Each  `metadata` model instance, `CrfMetadata` or `RequisitionMetadata`, is "owned" by some other CRF or REQUISITION model listed in the `visit_schedule`. 
+
+`CrfMetadata` model instances are created for each CRF listed in the visit schedule. That is, if the visit schedule schedules a CRF for 5 different visits, 5 `CrfMetadata` model instances will eventually be created. Metadata model instances are created when the `visit` model for a timepoint is saved.
+
+When you  `save` a CRF within a visit, the `entry_status` of the the metadata instance's it owns is updtaed from `REQUIRED` to `KEYED`.
+
+The same applies to `RequisitionMetadata` for REQUISITIONS.   
+
+### Entry status
+
+By default the `entry_status` field attribute is set to `REQUIRED`. You can change the default per CRF to `NOT_REQUIRED` in your declaration in the visit schedule.  See `visit_schedule.crf`.
+
+The same applies to REQUISITIONS.   
+
+
+## `metadata_rules` manipulate `metadata` model instances
+
+`metadata_rules` are declared to manipulate `metadata` model instances. The rules change the `entry_status` field attribute from `REQUIRED` to `NOT_REQUIRED` or visa-versa. 
+
+If the owner of the metadata instance, the CRF or REQUISITION model instance, exists, the entry status is updtaed to `KEYED`and the `metadata_rules` targeting the metadata instance are ignored. 
+
+"metadata rules" are run on each `save` of the visit and owner model instances.
+
+If a value on some other form implies that your form should not be completed, your form's metadata "entry_status" will change from REQUIRED to NOT REQUIRED upon `save` of the other form.
+
+Metadata is `updated` through a `post_save` signal that re-runs the metadata rules.
+
+
+## `metadata_rules` access data through `edc_reference`
+
+In order to de-couple the metadata rules from each owner model class, metadata rules access the field values for each model via `edc_reference` instead of directly.
+
+Each owner model class refeenced by metadata rules must be declared with the `ReferenceModelMixin` and the fields list registered with `site_reference_fields` global. This applies to all owner models, `source_model` and `target_models`. 
+
+See also `edc_reference`
 
 
 ### Getting started:
@@ -35,7 +68,7 @@ Your application also has one or more `Visit` models. Each visit model is declar
 
 Your `Crf` models are declared with the `CrfModelMixin`:
 
-    class CrfOne(CrfModelMixin, BaseUuidModel):
+    class CrfOne(CrfModelMixin, ReferenceModelMixin, BaseUuidModel):
     
         subject_visit = models.ForeignKey(SubjectVisit)
     
@@ -46,7 +79,7 @@ Your `Crf` models are declared with the `CrfModelMixin`:
     
 Your `Requisition` models are declared with the `RequisitionModelMixin`:
 
-    class SubjectRequisition(RequisitionModelMixin, BaseUuidModel):
+    class SubjectRequisition(RequisitionModelMixin, ReferenceModelMixin, BaseUuidModel):
     
         subject_visit = models.ForeignKey(SubjectVisit)
     
