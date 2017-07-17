@@ -45,7 +45,7 @@ Metadata is `updated` through a `post_save` signal that re-runs the metadata rul
 
 In order to de-couple the metadata rules from each owner model class, metadata rules access the field values for each model via `edc_reference` instead of directly.
 
-Each owner model class refeenced by metadata rules must be declared with the `ReferenceModelMixin` and the fields list registered with `site_reference_fields` global. This applies to all owner models, `source_model` and `target_models`. 
+Each owner model class refeenced by metadata rules must be declared with the `ReferenceModelMixin` and the fields list registered with `site_reference_configs` global. This applies to all owner models, `source_model` and `target_models`. 
 
 See also `edc_reference`
 
