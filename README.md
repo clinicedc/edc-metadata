@@ -65,6 +65,7 @@ Your application also has one or more `Visit` models. Each visit model is declar
     
         class Meta(RequiresConsentMixin.Meta):
             app_label = 'example'
+            rulegroup_app_label = 'metadata_rules_app'
 
 Your `Crf` models are declared with the `CrfModelMixin`:
 
