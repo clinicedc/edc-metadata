@@ -14,3 +14,4 @@ git+https://github.com/botswana-harvard/edc-timepoint@develop#egg=edc-timepoint
 git+https://github.com/botswana-harvard/edc-identifier@develop#egg=edc-identifier
 git+https://github.com/botswana-harvard/edc-reference@develop#egg=edc-reference
 git+https://github.com/botswana-harvard/edc-metadata-rules@develop#egg=edc-metadata-rules
+git+https://github.com/botswana-harvard/edc_facility@develop#egg=edc_facility
