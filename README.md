@@ -59,11 +59,11 @@ Let's prepare the models that will be used in the scheduled data collection. The
 Your application also has one or more `Visit` models. Each visit model is declared with the `CreatesMetadataModelMixin`:
 
     class SubjectVisit(CreatesMetadataModelMixin, PreviousVisitMixin, VisitModelMixin,
-                       RequiresConsentMixin, BaseUuidModel):
+                       RequiresConsentModelMixin, BaseUuidModel):
     
         appointment = models.OneToOneField(Appointment)
     
-        class Meta(RequiresConsentMixin.Meta):
+        class Meta(RequiresConsentModelMixin.Meta):
             app_label = 'example'
 
 Your `Crf` models are declared with the `CrfModelMixin`:
