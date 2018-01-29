@@ -59,11 +59,11 @@ Let's prepare the models that will be used in the scheduled data collection. The
 Your application also has one or more `Visit` models. Each visit model is declared with the `CreatesMetadataModelMixin`:
 
     class SubjectVisit(CreatesMetadataModelMixin, PreviousVisitMixin, VisitModelMixin,
-                       RequiresConsentMixin, BaseUuidModel):
+                       RequiresConsentModelMixin, BaseUuidModel):
     
         appointment = models.OneToOneField(Appointment)
     
-        class Meta(RequiresConsentMixin.Meta):
+        class Meta(RequiresConsentModelMixin.Meta):
             app_label = 'example'
 
 Your `Crf` models are declared with the `CrfModelMixin`:
@@ -293,3 +293,59 @@ crf or requisition model `post_save`:
 crf or requisition model `post_delete`:
 
 * the metadata instance for the crf/requisition is reset to the default `entry_status` and then all rules are run.
+
+
+### Changing visit_schedule name and/ or schedule name
+
+If the visit_schedule_name or schedule_name changes, the existing metadata must be manually updated. For example;
+
+
+    update edc_metadata_crfmetadata set visit_schedule_name='visit_schedule'
+    where visit_schedule_name='old_visit_schedule;
+    
+    update edc_metadata_crfmetadata set schedule_name='schedule'
+    where schedule_name='old_schedule;
+
+    update edc_metadata_requisitionmetadata set visit_schedule_name='visit_schedule'
+    where visit_schedule_name='old_visit_schedule;
+    
+    update edc_metadata_requisitionmetadata set schedule_name='schedule'
+    where schedule_name='old_schedule;
+
+You also need to update any existing enrollment and disenrollment model data. For example;
+
+    update ambition_subject_enrollment set visit_schedule_name='visit_schedule'
+    where visit_schedule_name='old_visit_schedule;
+
+    update ambition_subject_enrollment set schedule_name='schedule'
+    where schedule_name='old_schedule;
+
+For any other table that use these fields:
+
+    SELECT DISTINCT TABLE_NAME 
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE COLUMN_NAME IN ('visit_schedule_name','schedule_name')
+            AND TABLE_SCHEMA='edc';
+            
+A typical list of tables that need to be updated may look like this
+
+    +------------------------------------------+
+    | TABLE_NAME                               |
+    +------------------------------------------+
+    | ambition_subject_disenrollment           |
+    | ambition_subject_enrollment              |
+    | ambition_subject_historicaldisenrollment |
+    | ambition_subject_historicalenrollment    |
+    | ambition_subject_historicalsubjectvisit  |
+    | ambition_subject_subjectvisit            |
+    | edc_appointment_appointment              |
+    | edc_appointment_historicalappointment    |
+    | edc_metadata_crfmetadata                 |
+    | edc_metadata_requisitionmetadata         |
+    +------------------------------------------+
+
+In the code you need to update where the visit_schedule or schedule are hard coded.
+* visit schedule, schedule
+* Meta attributes on the enrollment and disenrollment models.
+
+    
