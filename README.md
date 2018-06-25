@@ -11,6 +11,8 @@ Metadata model instances are created for each visit when the `visit` model is sa
 Metadata is guaranteed to exist for every form defined in a visit after the visit form has been completed.
 
 
+Note: This module is coupled with `edc_metadata_files` and `edc_reference`.
+
 ## `metadata` model instances
 
 Each  `metadata` model instance, `CrfMetadata` or `RequisitionMetadata`, is managed by an actual CRF or REQUISITION model listed in the `visit_schedule`. 
