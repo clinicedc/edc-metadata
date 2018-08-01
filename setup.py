@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     url='http://github/clinicedc/edc-metadata',
-    license='GPL licence, see LICENCE',
+    license='GPL license, see LICENSE',
     description='Add a metadata layer to data entry.',
     long_description=README,
     zip_safe=False,
