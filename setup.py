@@ -25,6 +25,12 @@ setup(
     long_description=README,
     zip_safe=False,
     keywords='django Edc data entry metadata',
+    install_requires=[
+        'edc_appointment',
+        'edc-base',
+        'edc-visit-schedule',
+        'edc-visit-tracking',
+        'edc-reference'],
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
