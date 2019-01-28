@@ -5,3 +5,7 @@ omit =
     manage.py
     */migrations/*
     venv/*
+    runtests.py
+    .tox/*
+    .eggs/*
+    
