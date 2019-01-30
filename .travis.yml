@@ -20,10 +20,9 @@ branches:
 
 install:
 - pip install --upgrade pip
+- pip install flake8 coveralls tox
 - pip install -r requirements.txt
-- pip install flake8
 - pip install -e .
-- pip install coveralls
 
 before_script:
 - flake8 edc_metadata
