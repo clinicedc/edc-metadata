@@ -1,7 +1,6 @@
 language: python
 
 python:
-- 3.6
 - 3.7
 
 dist: xenial
@@ -11,16 +10,19 @@ sudo: true
 services:
 - mysql
 
+addons:
+  apt_packages:
+  - libcups2-dev
+
 branches:
   only:
   - develop
 
 install:
 - pip install --upgrade pip
+- pip install flake8 coveralls tox
 - pip install -r requirements.txt
-- pip install flake8
 - pip install -e .
-- pip install coveralls
 
 before_script:
 - flake8 edc_metadata

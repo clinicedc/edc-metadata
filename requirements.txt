@@ -3,3 +3,4 @@ edc-identifier
 edc-lab
 faker
 django_collect_offline
+edc-offstudy
