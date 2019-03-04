@@ -1,4 +1,4 @@
-|pypi| |travis| |coverage|
+|pypi| |travis| |codecov| |downloads|
 
 edc_metadata
 ------------
@@ -406,5 +406,9 @@ In the code you need to update where the visit_schedule or schedule are hard cod
 .. |travis| image:: https://travis-ci.org/clinicedc/edc-metadata.svg?branch=develop
     :target: https://travis-ci.org/clinicedc/edc-metadata
     
-.. |coverage| image:: https://coveralls.io/repos/github/clinicedc/edc-metadata/badge.svg?branch=develop
-    :target: https://coveralls.io/github/clinicedc/edc-metadata?branch=develop
+.. |codecov| image:: https://codecov.io/gh/clinicedc/edc-metadata/branch/develop/graph/badge.svg
+  :target: https://codecov.io/gh/clinicedc/edc-metadata
+
+.. |downloads| image:: https://pepy.tech/badge/edc-metadata
+   :target: https://pepy.tech/project/edc-metadata
+ 
