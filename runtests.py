@@ -80,6 +80,8 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "edc_dashboard.middleware.DashboardMiddleware",
+        "edc_subject_dashboard.middleware.DashboardMiddleware",
     ],
 
     LANGUAGE_CODE='en-us',
@@ -102,7 +104,7 @@ DEFAULT_SETTINGS = dict(
         'subject_dashboard_url': 'edc_subject_dashboard:subject_dashboard_url',
     },
     EDC_BOOTSTRAP=3,
-
+    EMAIL_CONTACTS={},
     DEFAULT_FILE_STORAGE='inmemorystorage.InMemoryStorage',
     MIGRATION_MODULES=DisableMigrations(),
     PASSWORD_HASHERS=('django.contrib.auth.hashers.MD5PasswordHasher', ),
