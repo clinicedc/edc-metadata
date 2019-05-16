@@ -13,7 +13,7 @@ edc_metadata
  Note: This module is coupled with ``edc_metadata_files`` and ``edc_reference``.
 
 ``metadata`` model instances
-==========================
+============================
 
 Each  ``metadata`` model instance, ``CrfMetadata`` or ``RequisitionMetadata``, is managed by an actual CRF or REQUISITION model listed in the ``visit_schedule``. 
 ``CrfMetadata` model instances are created for each CRF listed in the visit schedule. That is, if the visit schedule schedules a CRF for 5 different visits, 5 ``CrfMetadata` model instances will eventually be created. Metadata model instances are created when the ``visit`` model for a timepoint is saved.
@@ -30,7 +30,7 @@ By default the ``entry_status`` field attribute is set to ``REQUIRED``. You can 
 
 
 ``metadata_rules`` manipulate ``metadata`` model instances
-======================================================
+==========================================================
 
 ``metadata_rules`` are declared to manipulate ``metadata`` model instances. The rules change the ``entry_status`` field attribute from ``REQUIRED`` to ``NOT_REQUIRED`` or visa-versa. 
 If the manager of the metadata instance, the CRF or REQUISITION model instance, exists, the entry status is updated to ``KEYED``and the ``metadata_rules`` targeting the metadata instance are ignored.
@@ -42,7 +42,7 @@ Metadata is ``updated`` through a ``post_save`` signal that re-runs the ``metada
 
 
 ``metadata_rules`` access data through ``edc_reference``
-====================================================
+========================================================
 
 In order to de-couple the ``metadata rules`` from each managing model class, ``metadata rules`` access the field values for each model via ``edc_reference`` instead of directly from the model. It would be too complex and resource intensive to directly query each model separately every time the ``metadata rules`` are run.
 Each managing model class referenced by ``metadata rules`` must be declared with the ``ReferenceModelMixin`` and the fields list registered with ``site_reference_configs`` global. This applies to all managing models, ``source_model`` and ``target_models``. 
