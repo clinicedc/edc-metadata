@@ -1,4 +1,4 @@
-model-mommy
+model-bakery
 edc-identifier
 edc-lab
 faker
