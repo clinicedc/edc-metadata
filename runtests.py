@@ -9,7 +9,6 @@ from django.test.runner import DiscoverRunner
 from edc_test_utils import DefaultTestSettings
 from os.path import abspath, dirname
 
-
 app_name = 'edc_metadata'
 base_dir = dirname(abspath(__file__))
 
@@ -43,8 +42,8 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         'edc_sites.apps.AppConfig',
         'edc_timepoint.apps.AppConfig',
         'edc_visit_schedule.apps.AppConfig',
+        'edc_visit_tracking.apps.AppConfig',
         'edc_metadata.apps.EdcFacilityAppConfig',
-        'edc_metadata.apps.EdcVisitTrackingAppConfig',
         'edc_metadata.apps.AppConfig',
     ],
     add_dashboard_middleware=True,
