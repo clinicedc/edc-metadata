@@ -5,10 +5,10 @@ django_crypto_fields
 db.sqlite3
 
 # Swap
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
+[.-]*.s[a-v][a-z]
+[.-]*.sw[a-p]
+[.-]s[a-v][a-z]
+[.-]sw[a-p]
 
 # Session
 Session.vim
@@ -20,9 +20,9 @@ Session.vim
 tags
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+--pycache--/
 *.py[cod]
-_build/
+-build/
 # C extensions
 *.so
 
@@ -72,7 +72,7 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
+docs/-build/
 
 # PyBuilder
 target/
