@@ -403,8 +403,8 @@ In the code you need to update where the visit_schedule or schedule are hard cod
 .. |pypi| image:: https://img.shields.io/pypi/v/edc-metadata.svg
     :target: https://pypi.python.org/pypi/edc-metadata
     
-.. |travis| image:: https://travis-ci.org/clinicedc/edc-metadata.svg?branch=develop
-    :target: https://travis-ci.org/clinicedc/edc-metadata
+.. |travis| image:: https://travis-ci.com/clinicedc/edc-metadata.svg?branch=develop
+    :target: https://travis-ci.com/clinicedc/edc-metadata
     
 .. |codecov| image:: https://codecov.io/gh/clinicedc/edc-metadata/branch/develop/graph/badge.svg
   :target: https://codecov.io/gh/clinicedc/edc-metadata
