@@ -30,6 +30,8 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         "rest_framework.authtoken",
         # "django_collect_offline.apps.AppConfig",
         # "django_collect_offline_files.apps.AppConfig",
+        "multisite",
+        "import_export",
         "edc_appointment.apps.AppConfig",
         "edc_crf.apps.AppConfig",
         "edc_device.apps.AppConfig",
