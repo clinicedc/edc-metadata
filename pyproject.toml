@@ -9,10 +9,10 @@ py_version = "35"
 [tool.coverage.run]
 parallel = true
 branch = true
-source = ["edc_ltfu"]
+source = ["edc_metadata"]
 
 [tool.coverage.paths]
-source = ["edc_ltfu", ".tox/*/site-packages"]
+source = ["edc_metadata", ".tox/*/site-packages"]
 
 [tool.coverage.report]
 show_missing = true
