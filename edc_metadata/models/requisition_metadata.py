@@ -3,10 +3,10 @@ from edc_model import models as edc_models
 from edc_sites.models import CurrentSiteManager, SiteModelMixin
 
 from ..managers import RequisitionMetadataManager
-from .model_mixin import ModelMixin
+from .crf_metadata_model_mixin import CrfMetadataModelMixin
 
 
-class RequisitionMetadata(ModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
+class RequisitionMetadata(CrfMetadataModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
 
     panel_name = models.CharField(max_length=50, null=True)
 
@@ -14,7 +14,7 @@ class RequisitionMetadata(ModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
 
     objects = RequisitionMetadataManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"RequisitionMeta {self.model} {self.visit_schedule_name}."
             f"{self.schedule_name}.{self.visit_code}.{self.visit_code_sequence}@"
@@ -23,12 +23,12 @@ class RequisitionMetadata(ModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
         )
 
     @property
-    def verbose_name(self):
+    def verbose_name(self) -> str:
         from edc_lab.site_labs import site_labs
 
         return site_labs.panel_names.get(self.panel_name) or self.panel_name
 
-    def natural_key(self):
+    def natural_key(self) -> tuple:
         return (
             self.panel_name,
             self.model,
@@ -39,9 +39,10 @@ class RequisitionMetadata(ModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
             self.visit_code_sequence,
         )
 
-    natural_key.dependencies = ["sites.Site"]
+    # noinspection PyTypeHints
+    natural_key.dependencies = ["sites.Site"]  # type: ignore
 
-    class Meta(ModelMixin.Meta, edc_models.BaseUuidModel.Meta):
+    class Meta(CrfMetadataModelMixin.Meta, edc_models.BaseUuidModel.Meta):
         app_label = "edc_metadata"
         verbose_name = "Requisition Metadata"
         verbose_name_plural = "Requisition Metadata"

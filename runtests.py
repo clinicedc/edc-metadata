@@ -14,6 +14,7 @@ base_dir = dirname(abspath(__file__))
 
 DEFAULT_SETTINGS = DefaultTestSettings(
     calling_file=__file__,
+    MYPY_DJANGO_CONFIG=os.path.join(base_dir, "mypy.ini"),
     BASE_DIR=base_dir,
     APP_NAME=app_name,
     ETC_DIR=os.path.join(base_dir, app_name, "tests", "etc"),
@@ -40,7 +41,6 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         "edc_facility.apps.AppConfig",
         "edc_lab.apps.AppConfig",
         "edc_notification.apps.AppConfig",
-        "edc_metadata_rules.apps.AppConfig",
         "edc_offstudy.apps.AppConfig",
         "edc_protocol.apps.AppConfig",
         "edc_reference.apps.AppConfig",
