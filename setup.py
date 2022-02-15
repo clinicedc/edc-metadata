@@ -23,6 +23,7 @@ setup(
     url="http://github/clinicedc/edc-metadata",
     license="GPL license, see LICENSE",
     description="Add a metadata layer to data entry.",
+    long_description_content_type="text/x-rst",
     long_description=README,
     zip_safe=False,
     keywords="django Edc data entry metadata",
