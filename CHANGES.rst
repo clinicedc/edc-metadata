@@ -1,7 +1,9 @@
-Unreleased
-==========
-- TODO: when model instance does not exist but metadata instance is set to KEYED.
-  How do you reset? From the visit schedule only?
+0.3.21
+======
+- fix metadata validator returning multiple objects returned when validating requisition metadata
+
+0.3.20
+======
 
 0.3.19
 ======
