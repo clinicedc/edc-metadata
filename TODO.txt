@@ -1,0 +1,2 @@
+- when model instance does not exist but metadata instance is set to KEYED.
+  How do you reset? From the visit schedule only?
