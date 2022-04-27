@@ -14,7 +14,6 @@ base_dir = dirname(abspath(__file__))
 
 DEFAULT_SETTINGS = DefaultTestSettings(
     calling_file=__file__,
-    MYPY_DJANGO_CONFIG=os.path.join(base_dir, "mypy.ini"),
     BASE_DIR=base_dir,
     APP_NAME=app_name,
     ETC_DIR=os.path.join(base_dir, app_name, "tests", "etc"),
@@ -29,8 +28,6 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         "django_crypto_fields.apps.AppConfig",
         "django_revision.apps.AppConfig",
         "rest_framework.authtoken",
-        # "django_collect_offline.apps.AppConfig",
-        # "django_collect_offline_files.apps.AppConfig",
         "multisite",
         "import_export",
         "edc_action_item.apps.AppConfig",
