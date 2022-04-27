@@ -1,3 +1,9 @@
+0.3.22
+======
+- fix issue where PRN objects are added as required by default for all visits
+- fix not reseting PRN's after delete
+- update build metadata
+
 0.3.21
 ======
 - fix metadata validator returning multiple objects returned when validating requisition metadata

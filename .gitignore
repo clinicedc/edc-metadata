@@ -1,8 +1,10 @@
+_version.py
 django_crypto_fields
 .settings
 .project
 .pydevproject
 db.sqlite3
+*/.eggs/*
 
 # Swap
 [.-]*.s[a-v][a-z]
