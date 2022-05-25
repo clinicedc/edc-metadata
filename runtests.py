@@ -29,7 +29,6 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         "django_revision.apps.AppConfig",
         "rest_framework.authtoken",
         "multisite",
-        "import_export",
         "edc_action_item.apps.AppConfig",
         "edc_appointment.apps.AppConfig",
         "edc_crf.apps.AppConfig",
