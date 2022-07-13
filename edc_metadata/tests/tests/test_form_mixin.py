@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
-from django.test import TestCase, tag
+from django.test import TestCase
 from django.test.client import RequestFactory
 from edc_appointment.models import Appointment
 from edc_facility import import_holidays
@@ -13,9 +13,9 @@ from edc_visit_schedule import site_visit_schedules
 from edc_visit_tracking.constants import SCHEDULED
 
 from edc_metadata import site_metadata_rules
+from edc_metadata.metadata_helper import MetadataHelperMixin
+from edc_metadata.models import CrfMetadata, RequisitionMetadata
 
-from ...metadata_helper import MetadataHelperMixin
-from ...models import CrfMetadata, RequisitionMetadata
 from ..models import SubjectConsent, SubjectVisit
 from ..reference_configs import register_to_site_reference_configs
 from ..visit_schedule import visit_schedule
@@ -27,7 +27,6 @@ class MyForm(MetadataHelperMixin, FormValidator):
     pass
 
 
-@tag("12")
 class TestForm(TestCase):
     @classmethod
     def setUpTestData(cls):
