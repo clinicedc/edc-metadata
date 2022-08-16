@@ -27,7 +27,7 @@ DEFAULT_SETTINGS = DefaultTestSettings(
         "django.contrib.sites",
         "django_crypto_fields.apps.AppConfig",
         "django_revision.apps.AppConfig",
-        "rest_framework.authtoken",
+        # "rest_framework.authtoken",
         "multisite",
         "edc_action_item.apps.AppConfig",
         "edc_appointment.apps.AppConfig",
