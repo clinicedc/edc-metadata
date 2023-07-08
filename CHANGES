@@ -1,3 +1,11 @@
+0.3.53
+------
+- update code to handle model managers other than `on_site`
+- carry `site` FK model instance from reference object and never
+  set using get_current_site() method.
+- improvements to management command `update_metadata`
+- remove verbose warnings
+
 0.3.22
 ======
 - fix issue where PRN objects are added as required by default for all visits
