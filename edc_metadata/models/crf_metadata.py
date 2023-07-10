@@ -1,15 +1,12 @@
 from django.apps import apps as django_apps
 from django.db import models
-from edc_model import models as edc_models
-from edc_sites.models import CurrentSiteManager, SiteModelMixin
+from edc_model.models import BaseUuidModel
 
 from ..managers import CrfMetadataManager
 from .crf_metadata_model_mixin import CrfMetadataModelMixin
 
 
-class CrfMetadata(CrfMetadataModelMixin, SiteModelMixin, edc_models.BaseUuidModel):
-    on_site = CurrentSiteManager()
-
+class CrfMetadata(CrfMetadataModelMixin, BaseUuidModel):
     objects = CrfMetadataManager()
 
     def __str__(self) -> str:
@@ -40,9 +37,9 @@ class CrfMetadata(CrfMetadataModelMixin, SiteModelMixin, edc_models.BaseUuidMode
             return f"{e}. You need to regenerate metadata."
         return model._meta.verbose_name
 
-    class Meta(CrfMetadataModelMixin.Meta, edc_models.BaseUuidModel.Meta):
-        verbose_name = "Crf Metadata"
-        verbose_name_plural = "Crf Metadata"
+    class Meta(CrfMetadataModelMixin.Meta, BaseUuidModel.Meta):
+        verbose_name = "Crf collection status"
+        verbose_name_plural = "Crf collection status"
         unique_together = (
             (
                 "subject_identifier",

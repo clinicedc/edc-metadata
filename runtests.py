@@ -32,6 +32,7 @@ project_settings = DefaultTestSettings(
         "edc_facility.apps.AppConfig",
         "edc_lab.apps.AppConfig",
         "edc_list_data.apps.AppConfig",
+        "edc_locator.apps.AppConfig",
         "edc_notification.apps.AppConfig",
         "edc_offstudy.apps.AppConfig",
         "edc_protocol.apps.AppConfig",
