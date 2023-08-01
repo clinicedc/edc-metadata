@@ -15,9 +15,14 @@ edc_metadata
 ``metadata`` model instances
 ============================
 
-Each  ``metadata`` model instance, ``CrfMetadata`` or ``RequisitionMetadata``, is managed by an actual CRF or REQUISITION model listed in the ``visit_schedule``.
-``CrfMetadata` model instances are created for each CRF listed in the visit schedule. That is, if the visit schedule schedules a CRF for 5 different visits, 5 ``CrfMetadata` model instances will eventually be created. Metadata model instances are created when the ``visit`` model for a timepoint is saved.
-When you  ``save`` a CRF within a visit, the ``entry_status`` of the the metadata instance's it manages is updated from ``REQUIRED`` to ``KEYED``.
+Each  ``metadata`` model instance, ``CrfMetadata`` or ``RequisitionMetadata``, is managed by
+an actual CRF or REQUISITION model listed in the ``visit_schedule``.
+``CrfMetadata` model instances are created for each CRF listed in the visit schedule. That is,
+if the visit schedule schedules a CRF for 5 different visits, 5 ``CrfMetadata` model instances
+will eventually be created. Metadata model instances are created when the ``visit`` model for a
+timepoint is saved.
+When you  ``save`` a CRF within a visit, the ``entry_status`` of the the metadata instance`s
+it manages is updated from ``REQUIRED`` to ``KEYED``.
 
     The same applies to ``RequisitionMetadata`` for REQUISITIONS.
 
@@ -35,7 +40,7 @@ By default the ``entry_status`` field attribute is set to ``REQUIRED``. You can 
 ``metadata_rules`` are declared to manipulate ``metadata`` model instances. The rules change the ``entry_status`` field attribute from ``REQUIRED`` to ``NOT_REQUIRED`` or visa-versa.
 If the manager of the metadata instance, the CRF or REQUISITION model instance, exists, the entry status is updated to ``KEYED``and the ``metadata_rules`` targeting the metadata instance are ignored.
 ``metadata rules`` are run on each ``save`` of the visit and managing model instances.
-If a value on some other form implies that your form should not be completed, your form's metadata "entry_status" will change from REQUIRED to NOT REQUIRED upon ``save`` of the other form.
+If a value on some other form implies that your form should not be completed, your form`s metadata "entry_status" will change from REQUIRED to NOT REQUIRED upon ``save`` of the other form.
 Metadata is ``updated`` through a ``post_save`` signal that re-runs the ``metadata rules``.
 
     See also ``edc_metadata_rules``
@@ -56,7 +61,7 @@ Getting started
 Models: Visit, Crfs and Requisitions
 ====================================
 
-Let's prepare the models that will be used in the scheduled data collection. These models are your visit models, crf models and requisition models.
+Let`s prepare the models that will be used in the scheduled data collection. These models are your visit models, crf models and requisition models.
 
 Your application also has one or more ``Visit`` models. Each visit model is declared with the ``CreatesMetadataModelMixin``:
 
@@ -133,7 +138,7 @@ Writing metadata_rules
 ``metadata_rules`` are declared in a ``RuleGroup``. The syntax is similar to the ``django``
 model class.
 
-Let's start with an example from the perspective of the person entering subject data.
+Let`s start with an example from the perspective of the person entering subject data.
 On a dashboard there are 4 forms (models) to complete. The "rule" is that if the subject
 is male, only the first two forms should be complete. If the subject is female, only the
 last two forms should be complete. So the metadata should show:
@@ -193,9 +198,7 @@ Rules are declared as attributes of a RuleGroup much like fields in a ``django``
 your application. They are registered in the order in which they appear in the file. All rule
 groups are available from the ``site_metadata_rules`` global.
 
-Note::
-
-If the related visit model (SubjectVisit) has a different ``app_label`` than
+Note:If the related visit model (SubjectVisit) has a different ``app_label`` than
 ``Meta.app_label``, specify the related visit model ``label_lower`` on ``Meta`` to
 avoid raising a ``RuleGroupError``.
 
@@ -234,7 +237,7 @@ It is recommended to write the logic so that the ``consequence`` is REQUIRED if 
 ``predicate`` evaluates to  ``True``.
 
 In the examples above, the rule ``predicate`` can only access values that can be found
-on the subjects's current ``visit`` instance or ``registered_subject`` instance. If the
+on the subjects`s current ``visit`` instance or ``registered_subject`` instance. If the
 value you need for the rule ``predicate`` is not on either of those instances, you can
 pass a ``source_model``. With the ``source_model`` declared you would have these data
 available:
@@ -243,18 +246,16 @@ available:
 * registered subject (see ``edc_registration``)
 * source model instance for the current visit
 
-Let's say the rules changes and instead of refering to ``gender`` (male/female) you wish
+Let`s say the rules changes and instead of refering to ``gender`` (male/female) you wish
 to refer to the value field of ``favorite_transport`` on model ``CrfTransport``.
 ``favorite_transport`` can be "car" or "bicycle". You want the first rule ``predicate``
 to read as:
 
-* "If ``favorite_transport`` is equal to ``bicycle`` then set the metadata ``entry_status``
-for ``crf_one`` and ``crf_two`` to REQUIRED, if not, set both to NOT_REQUIRED"
+* If ``favorite_transport`` is equal to ``bicycle`` then set the metadata ``entry_status`` for ``crf_one`` and ``crf_two`` to REQUIRED, if not, set both to NOT_REQUIRED
 
 and the second to read as:
 
-* "If ``favorite_transport`` is equal to ``car`` then set the metadata ``entry_status``
-for ``crf_three`` and ``crf_four`` to REQUIRED, if not, set both to NOT_REQUIRED".
+* If ``favorite_transport`` is equal to ``car`` then set the metadata ``entry_status`` for ``crf_three`` and ``crf_four`` to REQUIRED, if not, set both to NOT_REQUIRED.
 
 The field for car/bicycle, ``favorite_transport`` is on model ``CrfTransport``. The
 RuleGroup might look like this:
@@ -294,7 +295,7 @@ to the visit model. Internally the query will be constructed like this:
     source_qs = CrfTansport.objects.filter(**{'{}__subject_identifier'.format(visit_attr): subject_identifier})
 
 * If the source model instance does not exist, the rules in the rule group will not run.
-* If the target model instance exists, no rule can change it's metadata from KEYED.
+* If the target model instance exists, no rule can change it`s metadata from KEYED.
 
 More Complex Rule Predicates
 ============================
@@ -336,8 +337,7 @@ must always evaluate to True or False.
 Rule Group Order
 ================
 
-    **IMPORTANT**: RuleGroups are evaluated in the order they are registered and the rules
-within each rule group are evaluated in the order they are declared on the RuleGroup.
+    **IMPORTANT**: RuleGroups are evaluated in the order they are registered and the rules within each rule group are evaluated in the order they are declared on the RuleGroup.
 
 
 Testing
@@ -346,8 +346,7 @@ Testing
 Since the order in which rules run matters, it is essential to test the rules together. See
 ``tests`` for some examples. When writing tests it may be helpful to know the following:
 
-* the standard Edc model configuration assumes you have consent->enrollment->appointments->
-visit->crfs and requisitions.
+* the standard Edc model configuration assumes you have consent->enrollment->appointments->visit->crfs and requisitions.
 * rules can be instected after boot up in the global registry ``site_metadata_rules``.
 * all rules are run when the visit  is saved.
 
@@ -376,9 +375,7 @@ In the ``signals`` file:
 
 **visit model ``post_save``:**
 
-* Metadata is created for a particular visit and visit code, e.g. 1000, when the ``visit``
-model is saved for a subject and visit code using the default ``entry_status`` configured in
-the ``visit_schedule``.
+* Metadata is created for a particular visit and visit code, e.g. 1000, when the ``visit`` model is saved for a subject and visit code using the default ``entry_status`` configured in the ``visit_schedule``.
 * Immediately after creating metadata, all rules for the ``app_label`` are run in order. The ``app_label`` is the ``app_label`` of the visit model.
 
 **crf or requisition model ``post_save``:**
@@ -387,8 +384,7 @@ the ``visit_schedule``.
 
 **crf or requisition model ``post_delete``:**
 
-* the metadata instance for the crf/requisition is reset to the default ``entry_status`` and
-then all rules are run.
+* the metadata instance for the crf/requisition is reset to the default ``entry_status`` and then all rules are run.
 
 
 Changing visit_schedule name and/ or schedule name
