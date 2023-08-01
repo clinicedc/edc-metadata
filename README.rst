@@ -130,9 +130,13 @@ Inspect ``metadata_rules`` from the site registry:
 Writing metadata_rules
 ======================
 
-``metadata_rules`` are declared in a ``RuleGroup``. The syntax is similar to the ``django`` model class.
+``metadata_rules`` are declared in a ``RuleGroup``. The syntax is similar to the ``django``
+model class.
 
-Let's start with an example from the perspective of the person entering subject data. On a dashboard there are 4 forms (models) to complete. The "rule" is that if the subject is male, only the first two forms should be complete. If the subject is female, only the last two forms should be complete. So the metadata should show:
+Let's start with an example from the perspective of the person entering subject data.
+On a dashboard there are 4 forms (models) to complete. The "rule" is that if the subject
+is male, only the first two forms should be complete. If the subject is female, only the
+last two forms should be complete. So the metadata should show:
 
 **Subject is Male:**
 
@@ -158,7 +162,10 @@ A ``Rule`` that changes the ``metadata`` if the subject is male would look like 
         alternative=NOT_REQUIRED,
         target_models=['crfone', 'crftwo'])
 
-The rule above has a ``predicate`` that evaluates to True or not. If ``gender`` is equal to ``MALE`` the consequence is ``REQUIRED``, else ``NOT_REQUIRED``. For this rule, for a MALE, the metadata ``entry_status`` for ``crf_one`` and ``crf_two`` will be updated to ``REQUIRED``. For a FEMALE both will be set to ``NOT_REQUIRED``.
+The rule above has a ``predicate`` that evaluates to True or not. If ``gender`` is equal
+to ``MALE`` the consequence is ``REQUIRED``, else ``NOT_REQUIRED``. For this rule, for a
+MALE, the metadata ``entry_status`` for ``crf_one`` and ``crf_two`` will be updated to
+``REQUIRED``. For a FEMALE both will be set to ``NOT_REQUIRED``.
 
 Rules are declared as attributes of a RuleGroup much like fields in a ``django`` model:
 
@@ -182,7 +189,32 @@ Rules are declared as attributes of a RuleGroup much like fields in a ``django``
         class Meta:
             app_label = 'edc_example'
 
-``RuleGroup`` class declarations are placed in file ``metadata_rules.py`` in the root of your application. They are registered in the order in which they appear in the file. All rule groups are available from the ``site_metadata_rules`` global.
+``RuleGroup`` class declarations are placed in file ``metadata_rules.py`` in the root of
+your application. They are registered in the order in which they appear in the file. All rule
+groups are available from the ``site_metadata_rules`` global.
+
+Note::
+
+If the related visit model (SubjectVisit) has a different ``app_label`` than
+``Meta.app_label``, specify the related visit model ``label_lower`` on ``Meta`` to
+avoid raising a ``RuleGroupError``.
+
+For example:
+
+.. code-block:: python
+
+    @register()
+    class ExampleRuleGroup(CrfRuleGroup):
+
+        crfs_male = CrfRule(
+            predicate=P('gender', 'eq', 'MALE'),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['crfone', 'crftwo'])
+
+        class Meta:
+            app_label = 'edc_example'
+            related_visit_model = "edc_visit_tracking.subjectvisit"
 
 More on Rules
 =============
@@ -198,23 +230,34 @@ The rule ``consequence`` and ``alternative`` except these values:
 * NOT_REQUIRED
 * DO_NOTHING
 
-It is recommended to write the logic so that the ``consequence`` is REQUIRED if the ``predicate`` evaluates to  ``True``.
+It is recommended to write the logic so that the ``consequence`` is REQUIRED if the
+``predicate`` evaluates to  ``True``.
 
-In the examples above, the rule ``predicate`` can only access values that can be found on the subjects's current ``visit`` instance or ``registered_subject`` instance. If the value you need for the rule ``predicate`` is not on either of those instances, you can pass a ``source_model``. With the ``source_model`` declared you would have these data available:
+In the examples above, the rule ``predicate`` can only access values that can be found
+on the subjects's current ``visit`` instance or ``registered_subject`` instance. If the
+value you need for the rule ``predicate`` is not on either of those instances, you can
+pass a ``source_model``. With the ``source_model`` declared you would have these data
+available:
 
 * current visit model instance
 * registered subject (see ``edc_registration``)
 * source model instance for the current visit
 
-Let's say the rules changes and instead of refering to ``gender`` (male/female) you wish to refer to the value field of ``favorite_transport`` on model ``CrfTransport``. ``favorite_transport`` can be "car" or "bicycle". You want the first rule ``predicate`` to read as:
+Let's say the rules changes and instead of refering to ``gender`` (male/female) you wish
+to refer to the value field of ``favorite_transport`` on model ``CrfTransport``.
+``favorite_transport`` can be "car" or "bicycle". You want the first rule ``predicate``
+to read as:
 
-* "If ``favorite_transport`` is equal to ``bicycle`` then set the metadata ``entry_status`` for ``crf_one`` and ``crf_two`` to REQUIRED, if not, set both to NOT_REQUIRED"
+* "If ``favorite_transport`` is equal to ``bicycle`` then set the metadata ``entry_status``
+for ``crf_one`` and ``crf_two`` to REQUIRED, if not, set both to NOT_REQUIRED"
 
 and the second to read as:
 
-* "If ``favorite_transport`` is equal to ``car`` then set the metadata ``entry_status`` for ``crf_three`` and ``crf_four`` to REQUIRED, if not, set both to NOT_REQUIRED".
+* "If ``favorite_transport`` is equal to ``car`` then set the metadata ``entry_status``
+for ``crf_three`` and ``crf_four`` to REQUIRED, if not, set both to NOT_REQUIRED".
 
-The field for car/bicycle, ``favorite_transport`` is on model ``CrfTransport``. The RuleGroup might look like this:
+The field for car/bicycle, ``favorite_transport`` is on model ``CrfTransport``. The
+RuleGroup might look like this:
 
 .. code-block:: python
 
@@ -237,7 +280,8 @@ The field for car/bicycle, ``favorite_transport`` is on model ``CrfTransport``. 
             app_label = 'edc_example'
             source_model = 'CrfTransport'
 
-Note that ``CrfTransport`` is a ``crf`` model in the Edc. That is, it has a ``foreign key`` to the visit model. Internally the query will be constructed like this:
+Note that ``CrfTransport`` is a ``crf`` model in the Edc. That is, it has a ``foreign key``
+to the visit model. Internally the query will be constructed like this:
 
 .. code-block:: python
 
@@ -255,7 +299,11 @@ Note that ``CrfTransport`` is a ``crf`` model in the Edc. That is, it has a ``fo
 More Complex Rule Predicates
 ============================
 
-There are two provided classes for the rule ``predicate``, ``P`` and ``PF``. With ``P`` you can make simple rule predicates like those used in the examples above. All standard opertors can be used. For example:
+There are two provided classes for the rule ``predicate``, ``P`` and ``PF``. With ``P`` you
+can make simple rule predicates like those used in the examples above. All standard opertors
+can be used.
+
+For example:
 
 .. code-block:: python
 
@@ -271,7 +319,9 @@ If the logic needs to a bit more complicated, the ``PF`` class allows you to pas
 
     predicate = PF('age', 'gender', func=lambda x, y: True if x >= 18 and x <= 64 and y == MALE else False)
 
-If the logic needs to be more complicated than is recommended for a simple lambda, you can just pass a function. When writing your function just remember that the rule ``predicate`` must always evaluate to True or False.
+If the logic needs to be more complicated than is recommended for a simple lambda, you can
+just pass a function. When writing your function just remember that the rule ``predicate``
+must always evaluate to True or False.
 
 .. code-block:: python
 
@@ -286,15 +336,18 @@ If the logic needs to be more complicated than is recommended for a simple lambd
 Rule Group Order
 ================
 
-    **IMPORTANT**: RuleGroups are evaluated in the order they are registered and the rules within each rule group are evaluated in the order they are declared on the RuleGroup.
+    **IMPORTANT**: RuleGroups are evaluated in the order they are registered and the rules
+within each rule group are evaluated in the order they are declared on the RuleGroup.
 
 
 Testing
 =======
 
-Since the order in which rules run matters, it is essential to test the rules together. See ``tests`` for some examples. When writing tests it may be helpful to know the following:
+Since the order in which rules run matters, it is essential to test the rules together. See
+``tests`` for some examples. When writing tests it may be helpful to know the following:
 
-* the standard Edc model configuration assumes you have consent->enrollment->appointments->visit->crfs and requisitions.
+* the standard Edc model configuration assumes you have consent->enrollment->appointments->
+visit->crfs and requisitions.
 * rules can be instected after boot up in the global registry ``site_metadata_rules``.
 * all rules are run when the visit  is saved.
 
@@ -323,7 +376,9 @@ In the ``signals`` file:
 
 **visit model ``post_save``:**
 
-* Metadata is created for a particular visit and visit code, e.g. 1000, when the ``visit`` model is saved for a subject and visit code using the default ``entry_status`` configured in the ``visit_schedule``.
+* Metadata is created for a particular visit and visit code, e.g. 1000, when the ``visit``
+model is saved for a subject and visit code using the default ``entry_status`` configured in
+the ``visit_schedule``.
 * Immediately after creating metadata, all rules for the ``app_label`` are run in order. The ``app_label`` is the ``app_label`` of the visit model.
 
 **crf or requisition model ``post_save``:**
@@ -332,14 +387,16 @@ In the ``signals`` file:
 
 **crf or requisition model ``post_delete``:**
 
-* the metadata instance for the crf/requisition is reset to the default ``entry_status`` and then all rules are run.
+* the metadata instance for the crf/requisition is reset to the default ``entry_status`` and
+then all rules are run.
 
 
 Changing visit_schedule name and/ or schedule name
 ==================================================
 
 
-If the visit_schedule_name or schedule_name changes, the existing metadata must be manually updated. For example;
+If the visit_schedule_name or schedule_name changes, the existing metadata must be manually
+updated. For example;
 
 
 .. code-block:: sql
