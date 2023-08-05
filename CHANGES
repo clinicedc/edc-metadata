@@ -1,4 +1,4 @@
-0.3.62
+0.3.63
 ------
 - add RuleGroup Meta class attribute `predicates`.
 - fix so that rule evaluator compiles a unique list of app_labels
