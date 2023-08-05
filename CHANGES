@@ -1,3 +1,9 @@
+0.3.62
+------
+- add RuleGroup Meta class attribute `predicates`.
+- fix so that rule evaluator compiles a unique list of app_labels
+  when selecting RuleGroups to run.
+
 0.3.54
 ------
 - refactor `MetadataRefresher` and `MetadataGetter`
