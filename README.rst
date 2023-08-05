@@ -198,9 +198,10 @@ Rules are declared as attributes of a RuleGroup much like fields in a ``django``
 your application. They are registered in the order in which they appear in the file. All rule
 groups are available from the ``site_metadata_rules`` global.
 
-Note:If the related visit model (SubjectVisit) has a different ``app_label`` than
-``Meta.app_label``, specify the related visit model ``label_lower`` on ``Meta`` to
-avoid raising a ``RuleGroupError``.
+    **IMPORTANT** If the related visit model (e.g. SubjectVisit) has a different ``app_label`` than
+    ``Meta.app_label``, a ``RuleGroupError`` will be raised because the ``RuleGroup`` assumes
+    the app_labels are the same. To avoid this, specify the related visit model ``label_lower``
+    on ``Meta``.
 
 For example:
 
@@ -219,10 +220,35 @@ For example:
             app_label = 'edc_example'
             related_visit_model = "edc_visit_tracking.subjectvisit"
 
+Inheritance
+===========
+
+When using single inheritance, set Meta class `abstract` on the base class:
+
+.. code-block:: python
+
+    class ExampleRuleGroup(CrfRuleGroup):
+
+        crfs_male = CrfRule(
+            predicate=P('gender', 'eq', 'MALE'),
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['crfone', 'crftwo'])
+
+        class Meta:
+            abstract = True
+
+
+    class MyRuleGroup(ExampleRuleGroup):
+        class Meta:
+            app_label = 'edc_example'
+            related_visit_model = "edc_visit_tracking.subjectvisit"
+
+
 More on Rules
 =============
 
-The rule ``consequence`` and ``alternative`` except these values:
+The rule ``consequence`` and ``alternative`` accept these values:
 
 .. code-block:: python
 
@@ -320,18 +346,133 @@ If the logic needs to a bit more complicated, the ``PF`` class allows you to pas
 
     predicate = PF('age', 'gender', func=lambda x, y: True if x >= 18 and x <= 64 and y == MALE else False)
 
+
+Rule predicates as functions
+============================
+
 If the logic needs to be more complicated than is recommended for a simple lambda, you can
 just pass a function. When writing your function just remember that the rule ``predicate``
 must always evaluate to True or False.
 
+The function will be called with:
+
+* ``visit``: the related_visit model instance
+* ``registered_subject``: the instance for the current subject
+* ``source_obj``: the model instance who triggered the post_save signal
+* ``source_qs``
+
 .. code-block:: python
 
-    def my_func(visit, registered_subject, source_obj, source_qs):
-        if source_obj.married and registered_subject.gender == FEMALE:
+    def my_func(visit, registered_subject, source_obj, source_qs) -> bool:
+        if registered_subject.age_in_years >= 18 and registered_subject.gender == FEMALE:
             return True
         return False
 
-    predicate = my_func
+The function is then called on the RuleGroup like this:
+
+.. code-block:: python
+
+    @register()
+    class ExampleRuleGroup(RuleGroup):
+
+        some_rule = CrfRule(
+            predicate=my_func,
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['crfone', 'crftwo'])
+
+        class Meta:
+            app_label = 'edc_example'
+            source_model = 'CrfTransport'
+
+Grouping rule predicate functions with ``PredicateCollection``
+==============================================================
+
+If you have many ``RuleGroups`` and predicate functions, it is better to collect your predicate functions into a class using ``PredicateCollection``:
+
+.. code-block:: python
+
+    class Predicates(PredicateCollection):
+        app_label = "edc_he"
+        visit_model = "edc_visit_tracking.subjectvisit"
+        household_head_model = "edc_he.healtheconomicshouseholdhead"
+        patient_model = "edc_he.healtheconomicspatient"
+
+        @property
+        def hoh_model_cls(self):
+            return django_apps.get_model(self.household_head_model)
+
+        @property
+        def patient_model_cls(self):
+            return django_apps.get_model(self.patient_model)
+
+        def patient_required(self, visit, **kwargs) -> bool:
+            required = False
+            if (
+                self.hoh_model_cls.objects.filter(
+                    subject_visit__subject_identifier=visit.subject_identifier
+                ).exists()
+                and not self.patient_model_cls.objects.filter(
+                    subject_visit__subject_identifier=visit.subject_identifier
+                ).exists()
+            ):
+                required = hoh_obj.hoh == YES
+            return required
+
+
+then you might do something like this in your ``metadata_rules`` module:
+
+.. code-block:: python
+
+    pc = Predicates()
+
+    @register()
+    class ExampleRuleGroup(RuleGroup):
+
+        some_rule = CrfRule(
+            predicate=pc.household_head_required,
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['healtheconomicshouseholdhead'])
+
+        some_other_rule = CrfRule(
+            predicate=pc.patient_required,
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['healtheconomicspatient'])
+
+        class Meta:
+            app_label = 'edc_he'
+            source_model = "edc_he.healtheconomics"
+            related_visit_model = "edc_visit_tracking.subjectvisit"
+
+Setting a custom ``PredicateCollection`` for a RuleGroup using Meta
+===================================================================
+
+If a ``RuleGroup`` has its own ``Predicate`` class you can declare it on the ``Meta`` class. Set the ``predicate`` attribute to the name of the function to call.
+
+.. code-block:: python
+
+    @register()
+    class ExampleRuleGroup(RuleGroup):
+
+        some_rule = CrfRule(
+            predicate="household_head_required",
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['healtheconomicshouseholdhead'])
+
+        some_other_rule = CrfRule(
+            predicate="patient_required",
+            consequence=REQUIRED,
+            alternative=NOT_REQUIRED,
+            target_models=['healtheconomicspatient'])
+
+        class Meta:
+            app_label = 'edc_he'
+            source_model = "edc_he.healtheconomics"
+            related_visit_model = "edc_visit_tracking.subjectvisit"
+            predicates = Predicates()
 
 
 Rule Group Order
@@ -339,6 +480,15 @@ Rule Group Order
 
     **IMPORTANT**: RuleGroups are evaluated in the order they are registered and the rules within each rule group are evaluated in the order they are declared on the RuleGroup.
 
+Updating metadata
+=================
+
+It is a good idea to updata metadata after code changes and data migrations. To do so just
+run the management command:
+
+.. code-block:: bash
+
+    python manage.py update_metadata
 
 Testing
 =======
@@ -385,72 +535,6 @@ In the ``signals`` file:
 **crf or requisition model ``post_delete``:**
 
 * the metadata instance for the crf/requisition is reset to the default ``entry_status`` and then all rules are run.
-
-
-Changing visit_schedule name and/ or schedule name
-==================================================
-
-
-If the visit_schedule_name or schedule_name changes, the existing metadata must be manually
-updated. For example;
-
-
-.. code-block:: sql
-
-    update edc_metadata_crfmetadata set visit_schedule_name='visit_schedule'
-    where visit_schedule_name='old_visit_schedule';
-
-    update edc_metadata_crfmetadata set schedule_name='schedule'
-    where schedule_name='old_schedule';
-
-    update edc_metadata_requisitionmetadata set visit_schedule_name='visit_schedule'
-    where visit_schedule_name='old_visit_schedule';
-
-    update edc_metadata_requisitionmetadata set schedule_name='schedule'
-    where schedule_name='old_schedule';
-
-You also need to update any existing enrollment and disenrollment model data. For example;
-
-.. code-block:: sql
-
-    update ambition_subject_enrollment set visit_schedule_name='visit_schedule'
-    where visit_schedule_name='old_visit_schedule';
-
-    update ambition_subject_enrollment set schedule_name='schedule'
-    where schedule_name='old_schedule';
-
-For any other table that use these fields:
-
-.. code-block:: sql
-
-    SELECT DISTINCT TABLE_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE COLUMN_NAME IN ('visit_schedule_name','schedule_name')
-            AND TABLE_SCHEMA='edc';
-
-A typical list of tables that need to be updated may look like this::
-
-    +------------------------------------------+
-    | TABLE_NAME                               |
-    +------------------------------------------+
-    | ambition_subject_disenrollment           |
-    | ambition_subject_enrollment              |
-    | ambition_subject_historicaldisenrollment |
-    | ambition_subject_historicalenrollment    |
-    | ambition_subject_historicalsubjectvisit  |
-    | ambition_subject_subjectvisit            |
-    | edc_appointment_appointment              |
-    | edc_appointment_historicalappointment    |
-    | edc_metadata_crfmetadata                 |
-    | edc_metadata_requisitionmetadata         |
-    +------------------------------------------+
-
-In the code you need to update where the visit_schedule or schedule are hard coded.
-
-* visit schedule, schedule
-* Meta attributes on the enrollment and disenrollment models.
-
-
 
 
 .. |pypi| image:: https://img.shields.io/pypi/v/edc-metadata.svg
