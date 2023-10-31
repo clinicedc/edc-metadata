@@ -10,8 +10,6 @@ edc_metadata
 * Metadata is guaranteed to exist for every form defined in a visit after the visit form has been submitted.
 
 
- Note: This module is coupled with ``edc_metadata_files`` and ``edc_reference``.
-
 ``metadata`` model instances
 ============================
 
@@ -46,15 +44,6 @@ Metadata is ``updated`` through a ``post_save`` signal that re-runs the ``metada
     See also ``edc_metadata_rules``
 
 
-``metadata_rules`` access data through ``edc_reference``
-========================================================
-
-In order to de-couple the ``metadata rules`` from each managing model class, ``metadata rules`` access the field values for each model via ``edc_reference`` instead of directly from the model. It would be too complex and resource intensive to directly query each model separately every time the ``metadata rules`` are run.
-Each managing model class referenced by ``metadata rules`` must be declared with the ``ReferenceModelMixin`` and the fields list registered with ``site_reference_configs`` global. This applies to all managing models, ``source_model`` and ``target_models``.
-
-    See also ``edc_reference``
-
-
 Getting started
 ---------------
 
@@ -75,11 +64,11 @@ Your application also has one or more ``Visit`` models. Each visit model is decl
         class Meta(RequiresConsentModelMixin.Meta):
             app_label = 'example'
 
-Your ``Crf`` models are declared with the ``CrfModelMixin`` and ``ReferenceModelMixin``:
+Your ``Crf`` models are declared with the ``CrfModelMixin``:
 
 .. code-block:: python
 
-    class CrfOne(CrfModelMixin, ReferenceModelMixin, BaseUuidModel):
+    class CrfOne(CrfModelMixin, BaseUuidModel):
 
         subject_visit = models.ForeignKey(SubjectVisit)
 
@@ -88,11 +77,11 @@ Your ``Crf`` models are declared with the ``CrfModelMixin`` and ``ReferenceModel
         class Meta:
             app_label = 'example'
 
-Your ``Requisition`` models are declared with the ``RequisitionModelMixin`` and ``ReferenceModelMixin``:
+Your ``Requisition`` models are declared with the ``RequisitionModelMixin``:
 
 .. code-block:: python
 
-    class SubjectRequisition(RequisitionModelMixin, ReferenceModelMixin, BaseUuidModel):
+    class SubjectRequisition(RequisitionModelMixin, BaseUuidModel):
 
         subject_visit = models.ForeignKey(SubjectVisit)
 
@@ -388,13 +377,11 @@ The function is then called on the RuleGroup like this:
 Grouping rule predicate functions with ``PredicateCollection``
 ==============================================================
 
-If you have many ``RuleGroups`` and predicate functions, it is better to collect your predicate functions into a class using ``PredicateCollection``:
+If you have many ``RuleGroups`` and predicate functions, it is useful to collect your predicate functions into a class:
 
 .. code-block:: python
 
-    class Predicates(PredicateCollection):
-        app_label = "edc_he"
-        visit_model = "edc_visit_tracking.subjectvisit"
+    class Predicates:
         household_head_model = "edc_he.healtheconomicshouseholdhead"
         patient_model = "edc_he.healtheconomicspatient"
 
