@@ -1,3 +1,12 @@
+
+0.3.79
+------
+- review and change indexes on CRF/Requisition models
+- convert unique_together to UniqueConstraint
+- refactor Creator classes to refer differentiate between
+  `metadata` model instance and `source` model instance
+- typing hints
+
 0.3.63
 ------
 - add RuleGroup Meta class attribute `predicates`.
