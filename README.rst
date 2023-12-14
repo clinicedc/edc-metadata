@@ -527,8 +527,8 @@ In the ``signals`` file:
 .. |pypi| image:: https://img.shields.io/pypi/v/edc-metadata.svg
     :target: https://pypi.python.org/pypi/edc-metadata
 
-.. |actions| image:: https://github.com/clinicedc/edc-metadata/workflows/build/badge.svg?branch=develop
-  :target: https://github.com/clinicedc/edc-metadata/actions?query=workflow:build
+.. |actions| image:: https://github.com/clinicedc/edc-metadata/actions/workflows/build.yml/badge.svg
+  :target: https://github.com/clinicedc/edc-metadata/actions/workflows/build.yml
 
 .. |codecov| image:: https://codecov.io/gh/clinicedc/edc-metadata/branch/develop/graph/badge.svg
   :target: https://codecov.io/gh/clinicedc/edc-metadata
