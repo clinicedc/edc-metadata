@@ -535,4 +535,3 @@ In the ``signals`` file:
 
 .. |downloads| image:: https://pepy.tech/badge/edc-metadata
    :target: https://pepy.tech/project/edc-metadata
-
